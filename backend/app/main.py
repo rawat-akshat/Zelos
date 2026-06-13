@@ -151,9 +151,13 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 
 # ============================================
-# API ROUTES (Will add later)
+# API ROUTES
 # ============================================
 
-# TODO: Add API v1 routes
-# from app.api.v1 import router as api_router
-# app.include_router(api_router, prefix="/api/v1")
+from app.api.v1.router import router as api_v1_router
+
+app.include_router(
+    api_v1_router,
+    prefix="/api/v1",
+    responses={404: {"description": "Not found"}},
+)
