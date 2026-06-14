@@ -8,46 +8,95 @@ export default function TodaysFocusCard() {
 
   return (
     <PanelCard accent>
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#C6A969" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--accent)" }}>
           Today&apos;s Focus
         </p>
         <span
           style={{
-            fontSize: 10, fontWeight: 600, padding: "2px 8px",
-            borderRadius: 99, background: "rgba(198,169,105,0.12)", color: "#C6A969",
+            fontSize: 10,
+            fontWeight: 600,
+            padding: "3px 10px",
+            borderRadius: 99,
+            background: "var(--accent-glow)",
+            color: "var(--accent)",
           }}
         >
           {focus.completedActions}/{focus.totalActions} done
         </span>
       </div>
 
-      <p style={{ fontSize: 15, fontWeight: 600, color: "#FFFFFF", marginBottom: 4 }}>{focus.title}</p>
-      <p style={{ fontSize: 12, color: "#6A6A6A", marginBottom: 14 }}>Last active yesterday</p>
+      <p style={{ fontSize: 16, fontWeight: 600, color: "var(--text-primary)", marginBottom: 6 }}>
+        {focus.title}
+      </p>
+      <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 16 }}>
+        Last active yesterday
+      </p>
 
-      {/* Progress bar */}
-      <div style={{ height: 6, borderRadius: 99, background: "rgba(255,255,255,0.07)", overflow: "hidden", marginBottom: 14 }}>
-        <div style={{ height: "100%", width: `${progress}%`, borderRadius: 99, background: "linear-gradient(90deg,#B89B5E,#C6A969)", transition: "width 500ms ease-out" }} />
+      <div
+        style={{
+          height: 5,
+          borderRadius: 99,
+          background: "var(--progress-track)",
+          overflow: "hidden",
+          marginBottom: 16,
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            width: `${progress}%`,
+            borderRadius: 99,
+            background: "linear-gradient(90deg, var(--accent-dim), var(--accent))",
+            transition: "width 500ms ease-out",
+          }}
+        />
       </div>
 
-      {/* Next action */}
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,0.04)", marginBottom: 14 }}>
-        <ArrowRight size={12} style={{ color: "#C6A969", marginTop: 2, flexShrink: 0 }} />
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 10,
+          padding: "12px 14px",
+          borderRadius: 12,
+          background: "var(--nav-hover-bg)",
+          marginBottom: 16,
+        }}
+      >
+        <ArrowRight size={12} style={{ color: "var(--accent)", marginTop: 2, flexShrink: 0 }} />
         <div>
-          <p style={{ fontSize: 12, color: "#B5B5B5", lineHeight: 1.4 }}>{focus.nextAction}</p>
+          <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.45 }}>
+            {focus.nextAction}
+          </p>
           <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 4 }}>
-            <Clock size={10} style={{ color: "#555" }} />
-            <span style={{ fontSize: 10, color: "#555" }}>{focus.estimatedMinutes} min</span>
+            <Clock size={10} style={{ color: "var(--text-muted)" }} />
+            <span style={{ fontSize: 10, color: "var(--text-muted)" }}>
+              {focus.estimatedMinutes} min
+            </span>
           </div>
         </div>
       </div>
 
-      {/* CTA */}
       <button
-        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "10px 0", borderRadius: 10, fontSize: 13, fontWeight: 600, background: "#C6A969", color: "#0F0F0F", border: "none", cursor: "pointer", transition: "background 150ms ease-out" }}
-        onMouseEnter={(e) => (e.currentTarget.style.background = "#D4AF37")}
-        onMouseLeave={(e) => (e.currentTarget.style.background = "#C6A969")}
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+          padding: "11px 0",
+          borderRadius: 12,
+          fontSize: 13,
+          fontWeight: 600,
+          background: "var(--accent)",
+          color: "var(--accent-on)",
+          border: "none",
+          cursor: "pointer",
+          transition: "background 200ms var(--ease)",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent-hover)")}
+        onMouseLeave={(e) => (e.currentTarget.style.background = "var(--accent)")}
       >
         Continue <ArrowRight size={13} />
       </button>

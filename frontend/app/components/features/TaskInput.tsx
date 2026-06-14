@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import { ArrowUp, Loader2, Paperclip, Mic } from "lucide-react";
-import { clsx } from "clsx";
 
 const PLACEHOLDERS = [
   "What feels overwhelming right now?",
@@ -58,17 +57,17 @@ export default function TaskInput({
 
   return (
     <div
-      className={clsx("relative rounded-[16px] transition-all duration-200")}
       style={{
-        background: "#1A1A1A",
+        position: "relative",
+        borderRadius: "var(--radius-card)",
+        background: "var(--bg-input)",
         border: focused
-          ? "1px solid rgba(198,169,105,0.45)"
+          ? "1px solid var(--border-focus)"
           : tooShort
-          ? "1px solid rgba(180,80,80,0.4)"
-          : "1px solid rgba(255,255,255,0.07)",
-        boxShadow: focused
-          ? "0 0 0 3px rgba(198,169,105,0.07), 0 4px 24px rgba(0,0,0,0.3)"
-          : "0 2px 12px rgba(0,0,0,0.2)",
+          ? "1px solid var(--error)"
+          : "1px solid var(--border)",
+        boxShadow: focused ? "var(--input-shadow-focus)" : "var(--input-shadow)",
+        transition: "border-color 200ms var(--ease), box-shadow 200ms var(--ease)",
       }}
     >
       <textarea
@@ -87,17 +86,17 @@ export default function TaskInput({
           resize: "none",
           background: "transparent",
           outline: "none",
-          padding: "16px 20px 48px",
+          padding: "14px 18px 44px",
           fontSize: 15,
           lineHeight: 1.6,
-          color: "#FFFFFF",
-          caretColor: "#C6A969",
+          color: "var(--text-primary)",
+          caretColor: "var(--accent)",
           opacity: loading ? 0.6 : 1,
+          fontFamily: "var(--font-body)",
         }}
         aria-label="Describe what you're stuck on"
       />
 
-      {/* Bottom action row */}
       <div
         style={{
           position: "absolute",
@@ -107,10 +106,9 @@ export default function TaskInput({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "0 14px 14px",
+          padding: "0 12px 12px",
         }}
       >
-        {/* Left: attach file */}
         <button
           type="button"
           title="Attach a file"
@@ -124,23 +122,23 @@ export default function TaskInput({
             background: "transparent",
             border: "none",
             cursor: "pointer",
-            color: "#444",
-            transition: "color 150ms",
+            color: "var(--text-muted)",
+            transition: "color 200ms var(--ease)",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#7A7A7A")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "#444")}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
           aria-label="Attach file"
         >
-          <Paperclip size={15} />
+          <Paperclip size={15} strokeWidth={1.5} />
         </button>
 
-        {/* Right: error hint + mic + submit */}
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           {tooShort && (
-            <span style={{ fontSize: 11, color: "#8C4A4A", marginRight: 2 }}>Keep typing…</span>
+            <span style={{ fontSize: 11, color: "var(--error)", marginRight: 2 }}>
+              Keep typing…
+            </span>
           )}
 
-          {/* Mic button */}
           <button
             type="button"
             title="Voice input"
@@ -155,20 +153,19 @@ export default function TaskInput({
               background: "transparent",
               border: "none",
               cursor: "pointer",
-              color: "#444",
-              transition: "color 150ms",
+              color: "var(--text-muted)",
+              transition: "color 200ms var(--ease)",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#7A7A7A")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#444")}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
           >
-            <Mic size={15} />
+            <Mic size={15} strokeWidth={1.5} />
           </button>
 
-          {/* Submit button */}
           <button
             onClick={handleSubmit}
             disabled={!canSubmit}
-            title="Break it down"
+            title="Submit"
             style={{
               display: "flex",
               alignItems: "center",
@@ -176,20 +173,31 @@ export default function TaskInput({
               width: 32,
               height: 32,
               borderRadius: 8,
-              background: canSubmit ? "#C6A969" : "rgba(198,169,105,0.15)",
-              border: "none",
+              background: canSubmit ? "var(--accent)" : "var(--accent-glow)",
+              border: canSubmit ? "1px solid var(--accent)" : "1px solid var(--border)",
               cursor: canSubmit ? "pointer" : "not-allowed",
-              transition: "all 150ms",
-              boxShadow: canSubmit ? "0 2px 10px rgba(198,169,105,0.28)" : "none",
+              transition: "background 200ms var(--ease), border-color 200ms var(--ease)",
             }}
-            onMouseEnter={(e) => { if (canSubmit) e.currentTarget.style.background = "#D4AF37"; }}
-            onMouseLeave={(e) => { if (canSubmit) e.currentTarget.style.background = "#C6A969"; }}
+            onMouseEnter={(e) => {
+              if (canSubmit) e.currentTarget.style.background = "var(--accent-hover)";
+            }}
+            onMouseLeave={(e) => {
+              if (canSubmit) e.currentTarget.style.background = "var(--accent)";
+            }}
             aria-label="Submit"
           >
             {loading ? (
-              <Loader2 size={14} color={canSubmit ? "#0F0F0F" : "#555"} className="animate-spin" />
+              <Loader2
+                size={14}
+                className="animate-spin"
+                style={{ color: canSubmit ? "var(--accent-on)" : "var(--text-muted)" }}
+              />
             ) : (
-              <ArrowUp size={14} strokeWidth={2.5} color={canSubmit ? "#0F0F0F" : "#555"} />
+              <ArrowUp
+                size={14}
+                strokeWidth={2}
+                style={{ color: canSubmit ? "var(--accent-on)" : "var(--text-muted)" }}
+              />
             )}
           </button>
         </div>

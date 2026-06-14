@@ -12,8 +12,8 @@ export default function Sidebar() {
     <aside
       style={{
         width: "var(--sidebar-width, 270px)",
-        background: "var(--bg-elevated, #151515)",
-        borderRight: "1px solid rgba(255,255,255,0.05)",
+        background: "var(--bg-elevated)",
+        borderRight: "1px solid var(--border)",
         position: "fixed",
         left: 0,
         top: 0,
@@ -25,10 +25,9 @@ export default function Sidebar() {
       }}
       className="hidden lg:flex"
     >
-      {/* Logo — centred horizontally, icon + name on same row */}
       <div
         style={{
-          padding: "44px 16px 36px 16px",
+          padding: "48px 16px 40px 16px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -41,29 +40,29 @@ export default function Sidebar() {
             width: 40,
             height: 40,
             borderRadius: 12,
-            background: "rgba(198,169,105,0.15)",
-            border: "1px solid rgba(198,169,105,0.2)",
+            background: "var(--accent-glow)",
+            border: "1px solid var(--border-accent)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
           }}
         >
-          <Zap size={20} color="#C6A969" strokeWidth={2.5} />
+          <Zap size={20} strokeWidth={2.5} style={{ color: "var(--accent)" }} />
         </div>
         <span
+          className="font-heading"
           style={{
             fontSize: 22,
-            fontWeight: 700,
-            color: "#FFFFFF",
-            letterSpacing: "0.14em",
+            fontWeight: 400,
+            color: "var(--text-primary)",
+            letterSpacing: "0.08em",
           }}
         >
           ZELOS
         </span>
       </div>
 
-      {/* Nav — equal padding left and right so boxes are centered in the panel */}
       <nav
         role="navigation"
         aria-label="Main"
@@ -72,7 +71,7 @@ export default function Sidebar() {
           padding: "0 16px",
           display: "flex",
           flexDirection: "column",
-          gap: "4px",
+          gap: "6px",
         }}
       >
         {NAV_ITEMS.map((item) => (
@@ -80,8 +79,7 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Bottom spacer */}
-      <div style={{ height: 24 }} />
+      <div style={{ height: 28 }} />
     </aside>
   );
 }

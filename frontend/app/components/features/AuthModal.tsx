@@ -26,7 +26,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
             alignItems: "center",
             justifyContent: "center",
             padding: "0 16px",
-            background: "rgba(0,0,0,0.75)",
+            background: "var(--bg-overlay)",
             backdropFilter: "blur(8px)",
           }}
           onClick={onClose}
@@ -40,15 +40,14 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
               position: "relative",
               width: "100%",
               maxWidth: 340,
-              borderRadius: 20,
-              padding: "32px 28px 28px",
-              background: "#1C1C1C",
-              border: "1px solid rgba(255,255,255,0.08)",
-              boxShadow: "0 32px 80px rgba(0,0,0,0.7)",
+              borderRadius: "var(--radius-card)",
+              padding: "36px 28px 28px",
+              background: "var(--bg-card)",
+              border: "1px solid var(--border)",
+              boxShadow: "var(--shadow-lg)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close */}
             <button
               onClick={onClose}
               aria-label="Close"
@@ -61,17 +60,16 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                 background: "none",
                 border: "none",
                 cursor: "pointer",
-                color: "#555",
+                color: "var(--text-muted)",
                 lineHeight: 0,
                 transition: "color 150ms",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#B5B5B5")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#555")}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
             >
               <X size={15} />
             </button>
 
-            {/* Icon */}
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
               <div
                 style={{
@@ -81,20 +79,20 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: "rgba(198,169,105,0.1)",
-                  border: "1px solid rgba(198,169,105,0.18)",
+                  background: "var(--accent-glow)",
+                  border: "1px solid var(--border-accent)",
                 }}
               >
-                <Zap size={20} color="#C6A969" strokeWidth={2} />
+                <Zap size={20} style={{ color: "var(--accent)" }} strokeWidth={2} />
               </div>
             </div>
 
-            {/* Copy */}
             <h2
+              className="font-heading"
               style={{
-                fontSize: 18,
-                fontWeight: 600,
-                color: "#FFFFFF",
+                fontSize: 22,
+                fontWeight: 400,
+                color: "var(--text-primary)",
                 textAlign: "center",
                 marginBottom: 8,
               }}
@@ -104,7 +102,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
             <p
               style={{
                 fontSize: 13,
-                color: "#7A7A7A",
+                color: "var(--text-secondary)",
                 textAlign: "center",
                 lineHeight: 1.55,
                 marginBottom: 28,
@@ -113,9 +111,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
               Build streaks, earn XP, and continue your journey across sessions.
             </p>
 
-            {/* Buttons */}
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-              {/* Google */}
               <button
                 style={{
                   display: "flex",
@@ -125,23 +121,21 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                   width: "100%",
                   padding: "13px 20px",
                   borderRadius: 12,
-                  background: "#C6A969",
-                  color: "#0F0F0F",
+                  background: "var(--accent)",
+                  color: "var(--accent-on)",
                   fontSize: 14,
                   fontWeight: 600,
                   border: "none",
                   cursor: "pointer",
-                  transition: "background 150ms",
-                  boxShadow: "0 2px 12px rgba(198,169,105,0.28)",
+                  transition: "background 200ms var(--ease)",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#D4AF37")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "#C6A969")}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent-hover)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "var(--accent)")}
               >
                 <GoogleIcon />
                 Continue with Google
               </button>
 
-              {/* Email */}
               <button
                 style={{
                   display: "flex",
@@ -151,26 +145,23 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                   padding: "13px 20px",
                   borderRadius: 12,
                   background: "transparent",
-                  color: "#C6A969",
+                  color: "var(--accent)",
                   fontSize: 14,
                   fontWeight: 500,
-                  border: "1px solid rgba(198,169,105,0.22)",
+                  border: "1px solid var(--border-accent)",
                   cursor: "pointer",
-                  transition: "all 150ms",
+                  transition: "all 180ms var(--ease)",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(198,169,105,0.06)";
-                  e.currentTarget.style.borderColor = "rgba(198,169,105,0.38)";
+                  e.currentTarget.style.background = "var(--accent-glow)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.borderColor = "rgba(198,169,105,0.22)";
                 }}
               >
                 Continue with Email
               </button>
 
-              {/* Skip */}
               <button
                 onClick={onClose}
                 style={{
@@ -178,12 +169,12 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                   border: "none",
                   cursor: "pointer",
                   fontSize: 12,
-                  color: "#555",
+                  color: "var(--text-muted)",
                   padding: "6px 12px",
                   transition: "color 150ms",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#7A7A7A")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "#555")}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
               >
                 Maybe later
               </button>

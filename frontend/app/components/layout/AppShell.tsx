@@ -26,47 +26,44 @@ export default function AppShell({ children }: AppShellProps) {
   })();
 
   return (
-    <div className="flex min-h-screen" style={{ background: "#0F0F0F" }}>
-      {/* Desktop Sidebar */}
+    <div className="flex min-h-screen" style={{ background: "var(--bg-base)" }}>
       <Sidebar />
 
-      {/* Mobile top bar */}
       <header
         className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3"
         style={{
-          background: "rgba(15,15,15,0.92)",
+          background: "var(--bg-elevated)",
           backdropFilter: "blur(16px)",
-          borderBottom: "1px solid rgba(255,255,255,0.05)",
+          borderBottom: "1px solid var(--border)",
         }}
       >
         <div className="flex items-center gap-2">
           <div
             className="w-6 h-6 rounded-md flex items-center justify-center"
-            style={{ background: "rgba(198,169,105,0.15)" }}
+            style={{ background: "var(--accent-glow)" }}
           >
-            <Zap size={12} color="#C6A969" strokeWidth={2.5} />
+            <Zap size={12} strokeWidth={2.5} style={{ color: "var(--accent)" }} />
           </div>
           <span
-            className="text-sm font-semibold tracking-widest"
-            style={{ color: "#FFFFFF" }}
+            className="font-heading text-sm tracking-widest"
+            style={{ color: "var(--text-primary)" }}
           >
             ZELOS
           </span>
         </div>
-        <span className="text-sm font-medium" style={{ color: "#B5B5B5" }}>
+        <span className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
           {pageTitle}
         </span>
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="p-1.5 rounded-lg"
-          style={{ color: "#7A7A7A" }}
+          style={{ color: "var(--text-muted)" }}
           aria-label="Open menu"
         >
           <Menu size={18} />
         </button>
       </header>
 
-      {/* Mobile menu overlay */}
       {mobileMenuOpen && (
         <div
           className="lg:hidden fixed inset-0 z-50 flex"
@@ -74,13 +71,13 @@ export default function AppShell({ children }: AppShellProps) {
         >
           <div
             className="absolute inset-0"
-            style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+            style={{ background: "var(--bg-overlay)", backdropFilter: "blur(4px)" }}
           />
           <nav
             className="relative w-64 h-full py-8 px-4 space-y-1"
             style={{
-              background: "#151515",
-              borderRight: "1px solid rgba(255,255,255,0.06)",
+              background: "var(--bg-elevated)",
+              borderRight: "1px solid var(--border)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -98,9 +95,9 @@ export default function AppShell({ children }: AppShellProps) {
                 onClick={() => setMobileMenuOpen(false)}
                 className="block px-4 py-3 rounded-[10px] text-sm transition-colors"
                 style={{
-                  color: pathname === href ? "#C6A969" : "#B5B5B5",
+                  color: pathname === href ? "var(--accent)" : "var(--text-secondary)",
                   background:
-                    pathname === href ? "rgba(198,169,105,0.1)" : "transparent",
+                    pathname === href ? "var(--nav-active-bg)" : "transparent",
                 }}
               >
                 {label}
@@ -110,13 +107,9 @@ export default function AppShell({ children }: AppShellProps) {
         </div>
       )}
 
-      {/* Main content */}
       <main
         className="flex-1 min-h-screen pt-12 lg:pt-0"
-        style={{
-          marginLeft: "0",
-          marginRight: "0",
-        }}
+        style={{ marginLeft: 0, marginRight: 0 }}
       >
         <style>{`
           @media (min-width: 1024px) {
@@ -133,7 +126,6 @@ export default function AppShell({ children }: AppShellProps) {
         {children}
       </main>
 
-      {/* Desktop Right Panel */}
       <RightPanel />
     </div>
   );

@@ -4,7 +4,7 @@ import { useState } from "react";
 import AppShell from "../components/layout/AppShell";
 import PageContent from "../components/layout/PageContent";
 import Card from "../components/ui/Card";
-import { Moon, Sun, Bell, BellOff, Shield, LogOut, ChevronRight } from "lucide-react";
+import { Bell, BellOff, Shield, LogOut, ChevronRight } from "lucide-react";
 
 function Toggle({
   checked,
@@ -21,9 +21,9 @@ function Toggle({
       aria-checked={checked}
       aria-label={label}
       onClick={() => onChange(!checked)}
-      className="relative flex-shrink-0 rounded-full transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C6A969]"
+      className="relative flex-shrink-0 rounded-full transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
       style={{
-        background: checked ? "#C6A969" : "rgba(255,255,255,0.1)",
+        background: checked ? "var(--accent)" : "var(--progress-track)",
         height: 22,
         width: 40,
       }}
@@ -54,20 +54,20 @@ function SettingRow({
   return (
     <div
       className="flex items-center gap-4 py-3.5 border-b last:border-b-0"
-      style={{ borderColor: "rgba(255,255,255,0.04)" }}
+      style={{ borderColor: "var(--border)" }}
     >
       <div
         className="w-8 h-8 rounded-[8px] flex items-center justify-center flex-shrink-0"
-        style={{ background: "rgba(255,255,255,0.05)" }}
+        style={{ background: "var(--nav-hover-bg)" }}
       >
-        <Icon size={15} style={{ color: "#7A7A7A" }} strokeWidth={1.75} />
+        <Icon size={15} style={{ color: "var(--text-muted)" }} strokeWidth={1.75} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium" style={{ color: "#E0E0E0" }}>
+        <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
           {label}
         </p>
         {description && (
-          <p className="text-xs mt-0.5" style={{ color: "#555" }}>
+          <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
             {description}
           </p>
         )}
@@ -92,7 +92,7 @@ function SettingSection({
           fontWeight: 600,
           letterSpacing: "0.12em",
           textTransform: "uppercase",
-          color: "#555",
+          color: "var(--text-muted)",
           textAlign: "center",
           marginBottom: 8,
         }}
@@ -105,7 +105,6 @@ function SettingSection({
 }
 
 export default function SettingsPage() {
-  const [darkMode, setDarkMode] = useState(true);
   const [notifications, setNotifications] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
 
@@ -113,13 +112,6 @@ export default function SettingsPage() {
     <AppShell>
       <PageContent title="Settings" subtitle="Customize your experience" maxWidth={480}>
         <SettingSection title="Appearance">
-          <SettingRow
-            icon={darkMode ? Moon : Sun}
-            label="Dark Mode"
-            description="Easier on the eyes, especially at night"
-          >
-            <Toggle checked={darkMode} onChange={setDarkMode} label="Toggle dark mode" />
-          </SettingRow>
           <SettingRow
             icon={Shield}
             label="Reduce Motion"
@@ -149,19 +141,19 @@ export default function SettingsPage() {
             label="Privacy & Data"
             description="Manage your data and export options"
           >
-            <ChevronRight size={14} style={{ color: "#555" }} />
+            <ChevronRight size={14} style={{ color: "var(--text-muted)" }} />
           </SettingRow>
           <SettingRow
             icon={LogOut}
             label="Sign Out"
             description="You're currently in mock mode"
           >
-            <ChevronRight size={14} style={{ color: "#555" }} />
+            <ChevronRight size={14} style={{ color: "var(--text-muted)" }} />
           </SettingRow>
         </SettingSection>
 
         <div className="text-center pt-2">
-          <p className="text-xs" style={{ color: "#3A3A3A" }}>
+          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
             Zelos · v1.0.0-beta · Mock Mode
           </p>
           <div className="flex items-center justify-center gap-4 mt-2">
@@ -169,9 +161,9 @@ export default function SettingsPage() {
               <button
                 key={link}
                 className="text-xs transition-colors"
-                style={{ color: "#3A3A3A" }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#555")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "#3A3A3A")}
+                style={{ color: "var(--text-muted)" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
               >
                 {link}
               </button>

@@ -9,6 +9,7 @@ import LearnMode from "./components/features/LearnMode";
 import FocusMode from "./components/features/FocusMode";
 import AuthModal from "./components/features/AuthModal";
 import CenterHero from "./components/features/CenterHero";
+import EditorialAccents from "./components/features/EditorialAccents";
 import UserBubble from "./components/features/UserBubble";
 import SuggestionCards from "./components/features/SuggestionCards";
 import LoadingSteps from "./components/features/LoadingSteps";
@@ -78,14 +79,16 @@ export default function HomePage() {
 
       <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
 
-      <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <div style={{ display: "flex", flexDirection: "column", height: "100vh", position: "relative" }}>
+
+        <EditorialAccents />
 
         {/* Always-visible hero */}
         <CenterHero />
 
         {/* Scrollable chat / suggestions area */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "8px 48px 0" }}>
-          <div style={{ maxWidth: 640, margin: "0 auto", width: "100%" }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "12px 56px 0", position: "relative", zIndex: 1 }}>
+          <div style={{ maxWidth: 600, margin: "0 auto", width: "100%" }}>
             <AnimatePresence mode="wait">
 
               {centerState === "home" && (
@@ -122,7 +125,7 @@ export default function HomePage() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.18 }}
-                  style={{ display: "flex", flexDirection: "column", gap: 20, paddingBottom: 24 }}
+                  style={{ display: "flex", flexDirection: "column", gap: 28, paddingBottom: 32 }}
                 >
                   <UserBubble text={promptText} />
 
@@ -143,9 +146,9 @@ export default function HomePage() {
                   <div style={{ textAlign: "center" }}>
                     <button
                       onClick={handleNewTask}
-                      style={{ fontSize: 12, color: "#555", background: "none", border: "none", cursor: "pointer", padding: "4px 8px", transition: "color 150ms" }}
-                      onMouseEnter={(e) => (e.currentTarget.style.color = "#7A7A7A")}
-                      onMouseLeave={(e) => (e.currentTarget.style.color = "#555")}
+                      style={{ fontSize: 12, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", padding: "4px 8px", transition: "color 180ms" }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
                     >
                       ← Start a new task
                     </button>
@@ -160,8 +163,16 @@ export default function HomePage() {
         </div>
 
         {/* Pinned input */}
-        <div style={{ flexShrink: 0, padding: "14px 48px 28px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-          <div style={{ maxWidth: 640, margin: "0 auto", width: "100%" }}>
+        <div
+          style={{
+            flexShrink: 0,
+            padding: "12px 56px 20px",
+            borderTop: "1px solid var(--border)",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          <div style={{ maxWidth: 600, margin: "0 auto", width: "100%" }}>
             <TaskInput onSubmit={handleSubmit} />
           </div>
         </div>

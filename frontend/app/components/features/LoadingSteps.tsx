@@ -14,7 +14,7 @@ interface LoadingStepsProps {
 
 export default function LoadingSteps({ activeStep }: LoadingStepsProps) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       {STEPS.map((step, i) => (
         <motion.div
           key={step}
@@ -29,13 +29,13 @@ export default function LoadingSteps({ activeStep }: LoadingStepsProps) {
               height: 6,
               borderRadius: "50%",
               flexShrink: 0,
-              background: i <= activeStep ? "#C6A969" : "rgba(255,255,255,0.1)",
+              background: i <= activeStep ? "var(--accent)" : "var(--progress-track)",
             }}
           />
           <span
             style={{
               fontSize: 13,
-              color: i <= activeStep ? "#B5B5B5" : "#3A3A3A",
+              color: i <= activeStep ? "var(--text-secondary)" : "var(--text-muted)",
             }}
           >
             {step}

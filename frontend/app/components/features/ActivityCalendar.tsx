@@ -24,7 +24,7 @@ export default function ActivityCalendar({
           style={{
             fontSize: 13,
             fontWeight: 600,
-            color: "#B5B5B5",
+            color: "var(--text-secondary)",
             textAlign: "center",
             marginBottom: 16,
           }}
@@ -35,7 +35,6 @@ export default function ActivityCalendar({
 
       <div style={{ display: "flex", justifyContent: "center" }}>
         <div>
-          {/* Day labels */}
           <div
             style={{
               display: "grid",
@@ -51,7 +50,7 @@ export default function ActivityCalendar({
                   width: CELL,
                   textAlign: "center",
                   fontSize: 9,
-                  color: "#444",
+                  color: "var(--text-muted)",
                 }}
               >
                 {d}
@@ -59,7 +58,6 @@ export default function ActivityCalendar({
             ))}
           </div>
 
-          {/* Cells */}
           <div
             style={{
               display: "grid",
@@ -76,8 +74,8 @@ export default function ActivityCalendar({
                   height: CELL,
                   borderRadius: 3,
                   background: day.active
-                    ? `rgba(198,169,105,${0.25 + (day.actionsCompleted / 6) * 0.65})`
-                    : "rgba(255,255,255,0.04)",
+                    ? `color-mix(in srgb, var(--accent) ${25 + (day.actionsCompleted / 6) * 65}%, transparent)`
+                    : "var(--calendar-inactive)",
                   cursor: "default",
                 }}
               />
@@ -96,7 +94,7 @@ export default function ActivityCalendar({
             marginTop: 14,
           }}
         >
-          <span style={{ fontSize: 10, color: "#444" }}>Less</span>
+          <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Less</span>
           {[0.1, 0.3, 0.6, 0.9].map((op) => (
             <div
               key={op}
@@ -104,11 +102,11 @@ export default function ActivityCalendar({
                 width: 10,
                 height: 10,
                 borderRadius: 2,
-                background: `rgba(198,169,105,${op})`,
+                background: `color-mix(in srgb, var(--accent) ${op * 100}%, transparent)`,
               }}
             />
           ))}
-          <span style={{ fontSize: 10, color: "#444" }}>More</span>
+          <span style={{ fontSize: 10, color: "var(--text-muted)" }}>More</span>
         </div>
       )}
     </div>

@@ -1,11 +1,5 @@
 "use client";
 
-// ─────────────────────────────────────────────────────────────────
-// To add a new card:
-//   1. Create a new file in ./right-panel/YourCard.tsx
-//   2. Import it below and drop it into the aside
-// ─────────────────────────────────────────────────────────────────
-
 import TodaysFocusCard from "./right-panel/TodaysFocusCard";
 import StreakCard from "./right-panel/StreakCard";
 import XPCard from "./right-panel/XPCard";
@@ -18,8 +12,8 @@ export default function RightPanel() {
       className="hidden xl:flex"
       style={{
         width: "var(--right-panel-width, 340px)",
-        background: "var(--bg-elevated, #151515)",
-        borderLeft: "1px solid rgba(255,255,255,0.05)",
+        background: "var(--bg-elevated)",
+        borderLeft: "1px solid var(--border)",
         position: "fixed",
         right: 0,
         top: 0,
@@ -27,8 +21,8 @@ export default function RightPanel() {
         overflowY: "auto",
         zIndex: 20,
         flexDirection: "column",
-        gap: 14,
-        padding: "32px 18px",
+        gap: 18,
+        padding: "40px 22px",
       }}
     >
       <TodaysFocusCard />
