@@ -46,7 +46,7 @@ export default function AppShell({ children }: AppShellProps) {
           </div>
           <span
             className="font-heading text-sm tracking-widest"
-            style={{ color: "var(--text-primary)" }}
+            style={{ color: "var(--text-primary)", fontWeight: 700 }}
           >
             ZELOS
           </span>

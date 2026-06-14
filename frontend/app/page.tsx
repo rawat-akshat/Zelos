@@ -83,12 +83,24 @@ export default function HomePage() {
 
         <EditorialAccents />
 
-        {/* Always-visible hero */}
-        <CenterHero />
+        <AnimatePresence mode="wait">
+          {centerState === "home" && (
+            <motion.div
+              key="hero"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{ flexShrink: 0, overflow: "hidden" }}
+            >
+              <CenterHero />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Scrollable chat / suggestions area */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "12px 56px 0", position: "relative", zIndex: 1 }}>
-          <div style={{ maxWidth: 600, margin: "0 auto", width: "100%" }}>
+        {/* Scrollable prompts / chat only */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "8px 20px 0", position: "relative", zIndex: 1, minHeight: 0 }}>
+          <div style={{ maxWidth: 720, margin: "0 auto", width: "100%" }}>
             <AnimatePresence mode="wait">
 
               {centerState === "home" && (
@@ -166,13 +178,13 @@ export default function HomePage() {
         <div
           style={{
             flexShrink: 0,
-            padding: "12px 56px 20px",
+            padding: "12px 20px 20px",
             borderTop: "1px solid var(--border)",
             position: "relative",
             zIndex: 1,
           }}
         >
-          <div style={{ maxWidth: 600, margin: "0 auto", width: "100%" }}>
+          <div style={{ maxWidth: 720, margin: "0 auto", width: "100%" }}>
             <TaskInput onSubmit={handleSubmit} />
           </div>
         </div>

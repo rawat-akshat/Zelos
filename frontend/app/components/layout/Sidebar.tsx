@@ -54,7 +54,7 @@ export default function Sidebar() {
           className="font-heading"
           style={{
             fontSize: 22,
-            fontWeight: 400,
+            fontWeight: 700,
             color: "var(--text-primary)",
             letterSpacing: "0.08em",
           }}

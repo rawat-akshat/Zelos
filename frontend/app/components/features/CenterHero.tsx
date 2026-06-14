@@ -3,7 +3,7 @@ export default function CenterHero() {
     <div
       style={{
         flexShrink: 0,
-        padding: "64px 56px 40px",
+        padding: "28px 20px 12px",
         textAlign: "center",
         position: "relative",
         zIndex: 1,
@@ -16,33 +16,24 @@ export default function CenterHero() {
           fontWeight: 400,
           lineHeight: 1.2,
           color: "var(--text-primary)",
-          marginBottom: 16,
+          marginBottom: 10,
           letterSpacing: "-0.01em",
         }}
       >
-        When you know what to do,
-        <br />
-        <span
-          style={{
-            fontStyle: "italic",
-            color: "var(--accent)",
-            fontWeight: 500,
-          }}
-        >
-          but can&apos;t get yourself to start.
-        </span>
+        What&apos;s keeping you stuck today?
       </h1>
       <p
+        className="font-heading"
         style={{
-          fontSize: 16,
-          color: "var(--text-secondary)",
-          lineHeight: 1.7,
-          maxWidth: 440,
-          margin: "0 auto",
-          fontWeight: 400,
+          fontSize: "clamp(20px, 2.4vw, 34px)",
+          fontStyle: "italic",
+          fontWeight: 500,
+          lineHeight: 1.3,
+          color: "var(--accent)",
+          letterSpacing: "-0.01em",
         }}
       >
-        Break overwhelming tasks into tiny actions and start in under 60 seconds.
+        Talk it through, understand the blocker, and take the next step.
       </p>
     </div>
   );

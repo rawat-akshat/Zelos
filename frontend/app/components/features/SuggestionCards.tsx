@@ -1,20 +1,38 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
 
 const SUGGESTIONS = [
-  "Update my resume but keep avoiding it",
-  "Study for an exam, don't know where to start",
-  "I know what to do but can't begin",
-];
+  "My exam is coming up soon and I know I need to study, but I can't figure out where to start so I keep putting it off.",
 
+  "I always seem to avoid important tasks until the last minute. Why does this happen even when I genuinely want to get them done?",
+
+  "I've been trying to update my resume for weeks. Every time I open it, I feel overwhelmed and end up doing something else instead.",
+
+  "What's the difference between procrastination, task paralysis, and executive dysfunction? I think I experience all three.",
+
+  "My room is a mess and I want to clean it, but I don't even know what to tackle first."
+];
 interface SuggestionCardsProps {
   onSelect: (text: string) => void;
 }
 
 export default function SuggestionCards({ onSelect }: SuggestionCardsProps) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+    <div>
+      <p
+        style={{
+          fontSize: 13,
+          fontWeight: 500,
+          color: "var(--text-muted)",
+          marginBottom: 10,
+          letterSpacing: "0.01em",
+        }}
+      >
+        Not sure where to start? Try one of these
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       {SUGGESTIONS.map((label, i) => (
         <motion.button
           key={label}
@@ -24,14 +42,15 @@ export default function SuggestionCards({ onSelect }: SuggestionCardsProps) {
           onClick={() => onSelect(label)}
           style={{
             display: "flex",
-            alignItems: "center",
-            gap: 0,
-            padding: "20px 26px",
+            alignItems: "flex-start",
+            gap: 12,
+            padding: "12px 16px",
             borderRadius: "var(--radius-card)",
             background: "var(--bg-card)",
             border: "1px solid var(--border)",
             color: "var(--text-secondary)",
-            fontSize: 15,
+            fontSize: 14,
+            lineHeight: 1.45,
             fontWeight: 400,
             cursor: "pointer",
             textAlign: "left",
@@ -51,9 +70,16 @@ export default function SuggestionCards({ onSelect }: SuggestionCardsProps) {
             e.currentTarget.style.background = "var(--bg-card)";
           }}
         >
-          {label}
+          <Sparkles
+            size={15}
+            strokeWidth={1.75}
+            style={{ color: "var(--accent)", flexShrink: 0, marginTop: 2 }}
+            aria-hidden
+          />
+          <span>{label}</span>
         </motion.button>
       ))}
+      </div>
     </div>
   );
 }
