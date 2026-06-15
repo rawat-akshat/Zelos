@@ -12,12 +12,12 @@ const FEATURES = [
     body: "Understand the psychology behind procrastination, perfectionism, overwhelm, and executive dysfunction.",
   },
   {
-    title: "Progress Tracking",
-    body: "Build momentum with streaks, achievements and visible progress.",
+    title: "Weekly Insights (Coming Soon)",
+    body: "Spot recurring patterns in your blockers, momentum, and progress. Over time, Zelos helps you better understand how you work and what helps you move forward.",
   },
   {
     title: "Session History",
-    body: "Revisit past breakthroughs and continue where you left off.",
+    body: "Return to past sessions and continue where you left off.",
   },
 ];
 
