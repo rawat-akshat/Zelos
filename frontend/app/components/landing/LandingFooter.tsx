@@ -1,62 +1,82 @@
 import Link from "next/link";
-import { Zap } from "lucide-react";
 
-const FOOTER_LINKS = ["Privacy", "Terms", "Help", "Contact"];
+const FOOTER_LINKS = [
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
+  { label: "Help", href: "/help" },
+  { label: "Contact", href: "/contact" },
+];
 
 export default function LandingFooter() {
   return (
     <footer
       style={{
-        padding: "64px clamp(24px, 5vw, 64px) 48px",
+        padding: "80px clamp(24px, 5vw, 64px) 48px",
         borderTop: "1px solid var(--landing-border)",
       }}
     >
-      <div
-        style={{
-          maxWidth: 1100,
-          margin: "0 auto",
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 24,
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              background: "rgba(107, 248, 253, 0.12)",
-              border: "1px solid rgba(107, 248, 253, 0.35)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Zap size={16} strokeWidth={2.5} style={{ color: "#1E1E1E" }} />
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            gap: 40,
+            marginBottom: 56,
+          }}
+        >
+          <div style={{ maxWidth: 320 }}>
+            <span
+              className="font-landing-heading"
+              style={{ fontSize: 20, color: "var(--landing-text)", display: "block", marginBottom: 12 }}
+            >
+              Zelos
+            </span>
+            <p className="landing-body-sm" style={{ margin: 0 }}>
+              Helping people move from intention to action.
+            </p>
           </div>
-          <span className="font-landing-heading" style={{ fontSize: 18, color: "var(--landing-text)" }}>
-            Zelos
-          </span>
+
+          <nav style={{ display: "flex", flexWrap: "wrap", gap: "12px 32px", alignItems: "flex-start" }}>
+            {FOOTER_LINKS.map(({ label, href }) => (
+              <Link
+                key={label}
+                href={href}
+                style={{
+                  fontSize: 14,
+                  color: "var(--landing-text-secondary)",
+                  textDecoration: "none",
+                }}
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
         </div>
 
-        <nav style={{ display: "flex", flexWrap: "wrap", gap: "8px 28px" }}>
-          {FOOTER_LINKS.map((label) => (
-            <Link
-              key={label}
-              href="#"
-              style={{
-                fontSize: 14,
-                color: "var(--landing-text-secondary)",
-                textDecoration: "none",
-              }}
-            >
-              {label}
-            </Link>
-          ))}
-        </nav>
+        <div
+          style={{
+            borderTop: "1px solid var(--landing-border)",
+            paddingTop: 40,
+            marginBottom: 40,
+          }}
+        >
+          <h3
+            className="font-landing-heading"
+            style={{ fontSize: 18, marginBottom: 12, color: "var(--landing-text)" }}
+          >
+            Acknowledgment
+          </h3>
+          <p className="landing-body-sm" style={{ margin: 0, maxWidth: 720, lineHeight: 1.65 }}>
+            Zelos is not designed for crisis situations and is not a replacement for professional
+            mental health care. If you are in immediate danger or experiencing a mental health
+            emergency, please seek professional help or contact local emergency services.
+          </p>
+        </div>
+
+        <p className="landing-caption" style={{ margin: 0 }}>
+          © Zelos 2026
+        </p>
       </div>
     </footer>
   );

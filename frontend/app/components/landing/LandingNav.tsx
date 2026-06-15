@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Zap } from "lucide-react";
 
 interface LandingNavProps {
   blurred?: boolean;
+  showCta?: boolean;
 }
 
-export default function LandingNav({ blurred = false }: LandingNavProps) {
+export default function LandingNav({ blurred = false, showCta = true }: LandingNavProps) {
   return (
     <header
       style={{
@@ -21,7 +21,7 @@ export default function LandingNav({ blurred = false }: LandingNavProps) {
         alignItems: "center",
         justifyContent: "space-between",
         padding: "0 clamp(24px, 5vw, 64px)",
-        background: blurred ? "rgba(245, 241, 234, 0.82)" : "transparent",
+        background: blurred ? "rgba(243, 238, 229, 0.82)" : "transparent",
         backdropFilter: blurred ? "blur(12px)" : "none",
         borderBottom: blurred ? "1px solid var(--landing-border)" : "1px solid transparent",
         transition: "background 200ms ease, border-color 200ms ease",
@@ -30,30 +30,13 @@ export default function LandingNav({ blurred = false }: LandingNavProps) {
       <Link
         href="/"
         style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
           textDecoration: "none",
           color: "var(--landing-text)",
         }}
       >
-        <div
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 10,
-            background: "rgba(107, 248, 253, 0.12)",
-            border: "1px solid rgba(107, 248, 253, 0.35)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Zap size={18} strokeWidth={2.5} style={{ color: "#1E1E1E" }} />
-        </div>
         <span
           className="font-landing-heading"
-          style={{ fontSize: 20, letterSpacing: "-0.02em", color: "var(--landing-text)" }}
+          style={{ fontSize: 28, letterSpacing: "-0.02em", color: "var(--landing-text)" }}
         >
           Zelos
         </span>
@@ -74,23 +57,23 @@ export default function LandingNav({ blurred = false }: LandingNavProps) {
         >
           Login
         </Link>
+        {showCta && (
         <Link
-          href="/login"
+          href="/try"
+          className="landing-btn-primary"
           style={{
             fontSize: 14,
             fontWeight: 600,
-            color: "var(--landing-accent-on)",
-            background: "var(--landing-accent)",
             padding: "10px 20px",
             borderRadius: 10,
+            background: "#C9A75C",
+            color: "#1E1E1E",
             textDecoration: "none",
-            transition: "background 180ms ease",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = "var(--landing-accent-hover)")}
-          onMouseLeave={(e) => (e.currentTarget.style.background = "var(--landing-accent)")}
         >
-          Get Started
+          Try Zelos
         </Link>
+        )}
       </div>
     </header>
   );

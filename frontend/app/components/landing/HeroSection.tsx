@@ -1,13 +1,30 @@
 "use client";
 
-import Link from "next/link";
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Paperclip, Mic, ArrowUp } from "lucide-react";
-
-const MOCK_TEXT =
-  "I've been trying to update my resume for weeks. Every time I open it, I feel overwhelmed and end up doing something else.";
+import { saveInitialPrompt } from "../../lib/initial-prompt";
 
 export default function HeroSection() {
+  const router = useRouter();
+  const [prompt, setPrompt] = useState("");
+
+  const canSubmit = prompt.trim().length > 0;
+
+  const submitPrompt = useCallback(() => {
+    if (!prompt.trim()) return;
+    saveInitialPrompt(prompt);
+    router.push("/try");
+  }, [prompt, router]);
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (canSubmit) submitPrompt();
+    }
+  }
+
   return (
     <section
       style={{
@@ -39,17 +56,35 @@ export default function HeroSection() {
           style={{
             textAlign: "left",
             background: "var(--landing-card)",
-            border: "1px solid var(--landing-border)",
+            border: "3px solid #B8A898",
             borderRadius: 24,
-            padding: "24px 26px 52px",
+            padding: "20px 26px 42px",
             boxShadow: "var(--landing-shadow)",
-            marginBottom: 36,
+            marginBottom: 24,
             position: "relative",
           }}
         >
-          <p className="landing-body" style={{ margin: 0 }}>
-            {MOCK_TEXT}
-          </p>
+          <textarea
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="I've been avoiding updating my resume for weeks..."
+            rows={2}
+            className="landing-body"
+            style={{
+              width: "100%",
+              margin: 0,
+              padding: 0,
+              border: "none",
+              outline: "none",
+              resize: "none",
+              background: "transparent",
+              color: "var(--landing-text)",
+              fontFamily: "inherit",
+              fontSize: "inherit",
+              lineHeight: "inherit",
+            }}
+          />
           <div
             style={{
               position: "absolute",
@@ -64,73 +99,30 @@ export default function HeroSection() {
             <Paperclip size={16} style={{ color: "var(--landing-text-muted)" }} />
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <Mic size={16} style={{ color: "var(--landing-text-muted)" }} />
-              <div
+              <button
+                type="button"
+                onClick={submitPrompt}
+                disabled={!canSubmit}
+                aria-label="Submit prompt"
+                className={canSubmit ? "landing-btn-primary" : undefined}
                 style={{
                   width: 32,
                   height: 32,
                   borderRadius: 8,
-                  background: "var(--landing-accent)",
+                  background: canSubmit ? "#C9A75C" : "var(--landing-border)",
+                  color: "#1E1E1E",
+                  border: "none",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  cursor: canSubmit ? "pointer" : "default",
+                  opacity: canSubmit ? 1 : 0.7,
                 }}
               >
-                <ArrowUp size={14} style={{ color: "var(--landing-accent-on)" }} />
-              </div>
+                <ArrowUp size={14} style={{ color: canSubmit ? "#1E1E1E" : "var(--landing-text-muted)" }} />
+              </button>
             </div>
           </div>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 12,
-            justifyContent: "center",
-            marginBottom: 20,
-          }}
-        >
-          <Link
-            href="/login"
-            style={{
-              fontSize: 15,
-              fontWeight: 600,
-              color: "var(--landing-accent-on)",
-              background: "var(--landing-accent)",
-              padding: "14px 28px",
-              borderRadius: 12,
-              textDecoration: "none",
-              transition: "background 180ms ease",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "var(--landing-accent-hover)")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "var(--landing-accent)")}
-          >
-            Get Started
-          </Link>
-          <a
-            href="#how-it-works"
-            style={{
-              fontSize: 15,
-              fontWeight: 500,
-              color: "var(--landing-text)",
-              background: "transparent",
-              padding: "14px 28px",
-              borderRadius: 12,
-              textDecoration: "none",
-              border: "1px solid var(--landing-border)",
-              transition: "border-color 180ms ease, background 180ms ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "rgba(30, 30, 30, 0.2)";
-              e.currentTarget.style.background = "rgba(255, 253, 249, 0.6)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "var(--landing-border)";
-              e.currentTarget.style.background = "transparent";
-            }}
-          >
-            See How It Works
-          </a>
         </div>
 
         <p className="landing-caption" style={{ margin: 0 }}>

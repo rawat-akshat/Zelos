@@ -4,13 +4,9 @@ import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 
 const SUGGESTIONS = [
-  "My exam is coming up soon and I know I need to study, but I can't figure out where to start so I keep putting it off.",
+"I've been trying to update my resume for weeks. Every time I open it, I feel overwhelmed and end up doing something else instead.",
 
   "I always seem to avoid important tasks until the last minute. Why does this happen even when I genuinely want to get them done?",
-
-  "I've been trying to update my resume for weeks. Every time I open it, I feel overwhelmed and end up doing something else instead.",
-
-  "What's the difference between procrastination, task paralysis, and executive dysfunction? I think I experience all three.",
 
   "My apartment is a complete mess, I have 5 outstanding bills to pay, and I need to book a dentist appointment. The sheer volume of things to do is making me dizzy, so I'm just sitting on the couch playing phone games."
 ];

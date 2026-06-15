@@ -22,22 +22,20 @@ export default function FinalCTASection() {
             Start with what&apos;s keeping you stuck today.
           </p>
           <Link
-            href="/login"
+            href="/try"
+            className="landing-btn-primary"
             style={{
               display: "inline-block",
               fontSize: 15,
               fontWeight: 600,
-              color: "var(--landing-accent-on)",
-              background: "var(--landing-accent)",
               padding: "14px 32px",
               borderRadius: 12,
+              background: "#C9A75C",
+              color: "#1E1E1E",
               textDecoration: "none",
-              transition: "background 180ms ease",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "var(--landing-accent-hover)")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "var(--landing-accent)")}
           >
-            Get Started
+            Try Zelos
           </Link>
         </div>
       </FadeUp>

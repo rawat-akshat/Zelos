@@ -31,8 +31,8 @@ function ListIcon({ positive }: { positive?: boolean }) {
         alignItems: "center",
         justifyContent: "center",
         marginTop: 3,
-        background: positive ? "rgba(107, 248, 253, 0.18)" : "rgba(30, 30, 30, 0.07)",
-        color: positive ? "#4A9599" : "#8A8FA0",
+        background: positive ? "rgba(201, 167, 92, 0.18)" : "rgba(30, 30, 30, 0.07)",
+        color: positive ? "#9A7B3C" : "#8A8FA0",
       }}
     >
       {positive ? <Check size={11} strokeWidth={2.5} /> : <X size={11} strokeWidth={2.5} />}
@@ -55,12 +55,12 @@ function ComparisonCard({
       style={{
         background: "var(--landing-card)",
         border: accent
-          ? "1px solid rgba(107, 248, 253, 0.45)"
+          ? "1px solid rgba(201, 167, 92, 0.45)"
           : "1px solid var(--landing-border)",
         borderRadius: 24,
         padding: "40px 36px",
         boxShadow: accent
-          ? "0 4px 28px rgba(107, 248, 253, 0.08), var(--landing-shadow)"
+          ? "0 4px 28px rgba(201, 167, 92, 0.08), var(--landing-shadow)"
           : "var(--landing-shadow)",
         height: "100%",
         transition: "transform 200ms ease, box-shadow 200ms ease",

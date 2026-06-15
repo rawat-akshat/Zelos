@@ -202,11 +202,11 @@ body {
   --landing-text: #1E1E1E;
   --landing-text-secondary: #676B7E;
   --landing-text-muted: #8A8FA0;
-  --landing-accent: #6BF8FD;
-  --landing-accent-hover: #59E4EA;
+  --landing-accent: #C9A75C;
+  --landing-accent-hover: #B8954F;
   --landing-accent-on: #1E1E1E;
-  --landing-border: rgba(30, 30, 30, 0.1);
-  --landing-border-focus: rgba(107, 248, 253, 0.55);
+  --landing-border: #DDD2C2;
+  --landing-border-focus: rgba(201, 167, 92, 0.55);
   --landing-shadow: 0 4px 24px rgba(30, 30, 30, 0.06);
   --landing-error: #C45C5C;
   --font-landing-heading: var(--font-newsreader), var(--font-instrument-serif), Georgia, serif;
@@ -302,4 +302,111 @@ body {
 
 .mockup-chat-scroll::-webkit-scrollbar {
   display: none;
+}
+
+.landing-page .landing-btn-primary,
+.landing-page a.landing-btn-primary,
+.landing-page button.landing-btn-primary {
+  display: inline-block;
+  background: #C9A75C;
+  color: #1E1E1E;
+  border: none;
+  cursor: pointer;
+  transition: background 180ms ease;
+}
+
+.landing-page .landing-btn-primary:hover,
+.landing-page a.landing-btn-primary:hover,
+.landing-page button.landing-btn-primary:hover {
+  background: #B8954F;
+  color: #1E1E1E;
+}
+
+.legal-prose {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.legal-prose p,
+.legal-prose li {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--landing-text-secondary);
+  margin: 0;
+}
+
+.legal-prose h2 {
+  font-family: var(--font-landing-heading);
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--landing-text);
+  margin: 12px 0 0;
+}
+
+.legal-prose h3 {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--landing-text);
+  margin: 8px 0 0;
+}
+
+.legal-prose ul {
+  margin: 0;
+  padding-left: 1.35rem;
+  list-style-type: disc;
+  list-style-position: outside;
+}
+
+.legal-prose li + li {
+  margin-top: 8px;
+}
+
+.legal-prose li ul {
+  margin-top: 10px;
+}
+
+.legal-prose li strong {
+  color: var(--landing-text);
+  font-weight: 600;
+}
+
+.help-faq-answer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 0 20px;
+}
+
+.help-faq-answer p,
+.help-faq-answer li {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--landing-text-secondary);
+  margin: 0;
+}
+
+.help-faq-answer ul {
+  margin: 0;
+  padding-left: 1.35rem;
+  list-style-type: disc;
+  list-style-position: outside;
+}
+
+.help-faq-answer li + li {
+  margin-top: 6px;
+}
+
+.help-faq-answer a {
+  color: var(--landing-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.legal-prose a {
+  color: var(--landing-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
