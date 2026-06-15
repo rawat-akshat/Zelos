@@ -5,7 +5,7 @@ export default function MockupSidebar() {
     <div
       style={{
         width: "22%",
-        background: "#F2ECE2",
+        background: "#F0E9DD",
         borderRight: "1px solid rgba(30, 30, 30, 0.06)",
         padding: "18px 14px",
         display: "flex",

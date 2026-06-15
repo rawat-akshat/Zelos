@@ -5,7 +5,7 @@ export default function MockupRightPanel() {
     <div
       style={{
         width: "26%",
-        background: "#F2ECE2",
+        background: "#F0E9DD",
         borderLeft: "1px solid rgba(30, 30, 30, 0.06)",
         padding: "14px 12px",
         display: "flex",

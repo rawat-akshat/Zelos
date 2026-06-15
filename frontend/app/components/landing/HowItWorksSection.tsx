@@ -25,7 +25,7 @@ export default function HowItWorksSection() {
     <section
       id="how-it-works"
       style={{
-        padding: "120px clamp(24px, 5vw, 64px)",
+        padding: "72px clamp(24px, 5vw, 64px)",
         position: "relative",
         zIndex: 1,
       }}

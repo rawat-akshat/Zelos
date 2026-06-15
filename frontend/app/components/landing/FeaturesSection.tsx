@@ -5,11 +5,11 @@ import FadeUp from "./FadeUp";
 const FEATURES = [
   {
     title: "Task Breakdown",
-    body: "Turn overwhelming goals into small actionable steps.",
+    body: "Turn overwhelming projects into tiny, actionable steps your brain can actually start."
   },
   {
     title: "Learn Mode",
-    body: "Understand concepts like task paralysis, perfectionism, overwhelm and executive dysfunction.",
+    body: "Understand the psychology behind procrastination, perfectionism, overwhelm, and executive dysfunction.",
   },
   {
     title: "Progress Tracking",

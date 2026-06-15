@@ -11,12 +11,11 @@ export default function HeroSection() {
   return (
     <section
       style={{
-        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
-        padding: "120px clamp(24px, 5vw, 64px) 80px",
+        justifyContent: "flex-start",
+        padding: "140px clamp(24px, 5vw, 64px) 64px",
         textAlign: "center",
         position: "relative",
         zIndex: 1,
@@ -135,7 +134,7 @@ export default function HeroSection() {
         </div>
 
         <p className="landing-caption" style={{ margin: 0 }}>
-          No productivity hacks. Just clarity and action.
+          No productivity hacks. Just self-awareness and momentum.
         </p>
       </motion.div>
     </section>

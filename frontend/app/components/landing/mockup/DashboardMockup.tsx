@@ -6,7 +6,7 @@ export default function DashboardMockup() {
   return (
     <div
       style={{
-        background: "#F7F3EB",
+        background: "#F5F0E6",
         borderRadius: 16,
         overflow: "hidden",
         border: "1px solid rgba(30, 30, 30, 0.08)",

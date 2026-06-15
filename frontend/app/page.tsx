@@ -7,7 +7,9 @@ import LandingBackground from "./components/landing/LandingBackground";
 import HeroSection from "./components/landing/HeroSection";
 import HowItWorksSection from "./components/landing/HowItWorksSection";
 import ProductPreviewSection from "./components/landing/ProductPreviewSection";
+import WhyTraditionalToolsSection from "./components/landing/WhyTraditionalToolsSection";
 import FeaturesSection from "./components/landing/FeaturesSection";
+import WhyZelosExistsSection from "./components/landing/WhyZelosExistsSection";
 import SocialProofSection from "./components/landing/SocialProofSection";
 import FAQSection from "./components/landing/FAQSection";
 import FinalCTASection from "./components/landing/FinalCTASection";
@@ -28,7 +30,9 @@ export default function LandingPage() {
         <HeroSection />
         <HowItWorksSection />
         <ProductPreviewSection />
+        <WhyTraditionalToolsSection />
         <FeaturesSection />
+        <WhyZelosExistsSection />
         <SocialProofSection />
         <FAQSection />
         <FinalCTASection />

@@ -14,8 +14,8 @@
   --font-body: var(--font-inter), system-ui, sans-serif;
 
   /* Palette */
-  --bg-base: #F7F3EB;
-  --bg-elevated: #F2ECE2;
+  --bg-base: #F5F0E6;
+  --bg-elevated: #F0E9DD;
   --bg-card: #FDFBF7;
   --bg-card-hover: #F9F5EE;
   --bg-input: #FDFBF7;
@@ -63,7 +63,7 @@
 
   --scrollbar: rgba(42, 39, 35, 0.12);
   --skeleton-from: #FDFBF7;
-  --skeleton-via: #F2ECE2;
+  --skeleton-via: #F0E9DD;
   --calendar-inactive: rgba(221, 210, 194, 0.5);
   --editorial-watermark-opacity: 0.14;
   --editorial-stroke-base: #B5A89A;
@@ -196,7 +196,7 @@ body {
 
 /* Landing / marketing pages */
 .landing-page {
-  --landing-bg: #F5F1EA;
+  --landing-bg: #F3EEE5;
   --landing-card: #FFFDF9;
   --landing-card-surface: #E8E0D1;
   --landing-text: #1E1E1E;
