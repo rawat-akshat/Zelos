@@ -16,7 +16,7 @@ export default function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
 
   const pageTitle = (() => {
-    if (pathname === "/") return "Home";
+    if (pathname === "/dashboard") return "Home";
     if (pathname === "/history") return "History";
     if (pathname === "/insights") return "Insights";
     if (pathname === "/streaks") return "Streaks";
@@ -82,7 +82,7 @@ export default function AppShell({ children }: AppShellProps) {
             onClick={(e) => e.stopPropagation()}
           >
             {[
-              { href: "/", label: "Home" },
+              { href: "/dashboard", label: "Home" },
               { href: "/history", label: "History" },
               { href: "/insights", label: "Insights" },
               { href: "/streaks", label: "Streaks" },

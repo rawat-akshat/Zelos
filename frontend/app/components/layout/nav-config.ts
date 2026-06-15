@@ -19,7 +19,7 @@ export interface NavConfig {
 // Add or remove nav items here — nothing else needs to change.
 // ─────────────────────────────────────────────────────────────────
 export const NAV_ITEMS: NavConfig[] = [
-  { href: "/",             icon: Home,        label: "Home" },
+  { href: "/dashboard",      icon: Home,        label: "Home" },
   { href: "/history",      icon: History,     label: "History" },
   { href: "/insights",     icon: BarChart2,   label: "Insights" },
   { href: "/streaks",      icon: Flame,       label: "Streaks" },

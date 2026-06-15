@@ -12,7 +12,7 @@ const SUGGESTIONS = [
 
   "What's the difference between procrastination, task paralysis, and executive dysfunction? I think I experience all three.",
 
-  "My room is a mess and I want to clean it, but I don't even know what to tackle first."
+  "My apartment is a complete mess, I have 5 outstanding bills to pay, and I need to book a dentist appointment. The sheer volume of things to do is making me dizzy, so I'm just sitting on the couch playing phone games."
 ];
 interface SuggestionCardsProps {
   onSelect: (text: string) => void;
