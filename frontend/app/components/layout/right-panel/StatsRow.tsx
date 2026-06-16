@@ -27,7 +27,7 @@ export default function StatsRow() {
         >
           <span
             className="font-heading"
-            style={{ fontSize: 22, fontWeight: 400, color: "var(--text-primary)" }}
+            style={{ fontSize: 22, color: "var(--text-primary)", letterSpacing: "-0.04em" }}
           >
             {value}
           </span>

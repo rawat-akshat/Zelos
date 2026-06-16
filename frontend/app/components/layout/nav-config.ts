@@ -1,9 +1,7 @@
 import {
-  Home,
-  History,
-  BarChart2,
-  Flame,
-  Trophy,
+  LayoutGrid,
+  Clock,
+  User,
   Settings,
   HelpCircle,
   LucideIcon,
@@ -15,15 +13,18 @@ export interface NavConfig {
   label: string;
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Add or remove nav items here — nothing else needs to change.
-// ─────────────────────────────────────────────────────────────────
 export const NAV_ITEMS: NavConfig[] = [
-  { href: "/dashboard",      icon: Home,        label: "Home" },
-  { href: "/history",      icon: History,     label: "History" },
-  { href: "/insights",     icon: BarChart2,   label: "Insights" },
-  { href: "/streaks",      icon: Flame,       label: "Streaks" },
-  { href: "/achievements", icon: Trophy,      label: "Achievements" },
-  { href: "/settings",     icon: Settings,    label: "Settings" },
-  { href: "#help",         icon: HelpCircle,  label: "Help" },
+  { href: "/dashboard", icon: LayoutGrid, label: "Workspace" },
+  { href: "/sessions", icon: Clock, label: "My Sessions" },
+  { href: "/profile", icon: User, label: "Profile" },
+  { href: "/settings", icon: Settings, label: "Settings" },
+  { href: "/support", icon: HelpCircle, label: "Help" },
 ];
+
+export const NAV_PAGE_TITLES: Record<string, string> = {
+  "/dashboard": "Workspace",
+  "/sessions": "My Sessions",
+  "/profile": "Profile",
+  "/settings": "Settings",
+  "/support": "Help",
+};

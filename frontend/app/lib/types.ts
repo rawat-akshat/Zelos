@@ -14,6 +14,8 @@ export interface Action {
   estimatedMinutes: number;
   completed: boolean;
   completedAt?: Date;
+  /** Hidden sub-steps from backend — revealed once via Break It Down */
+  subSteps?: string[];
 }
 
 export interface TaskResponse {
@@ -23,7 +25,13 @@ export interface TaskResponse {
   blockerLabel: string;
   explanation: string;
   actions: Action[];
+  suggestedQuestions?: string[];
   concept?: string;
+  /** Different strategy for Try Another Approach */
+  alternative?: {
+    explanation: string;
+    actions: Action[];
+  };
 }
 
 export interface LearnSection {
@@ -34,10 +42,9 @@ export interface LearnSection {
 export interface LearnResponse {
   mode: "learn";
   sessionId: string;
-  title: string;
-  summary: string;
-  sections: LearnSection[];
-  suggestedQuestions: string[];
+  explanation: string;
+  actions?: Action[];
+  suggestedQuestions?: string[];
 }
 
 export interface MixedResponse {
@@ -69,6 +76,7 @@ export interface UserStats {
   tasksCompleted: number;
   focusSessions: number;
   totalActionsCompleted: number;
+  totalSessions: number;
 }
 
 export interface Achievement {

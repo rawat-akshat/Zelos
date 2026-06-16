@@ -1,14 +1,6 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Instrument_Serif, Inter, Newsreader } from "next/font/google";
+import { Instrument_Serif, Inter, Newsreader } from "next/font/google";
 import "./globals.css";
-
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  variable: "--font-cormorant",
-  display: "swap",
-});
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
@@ -48,7 +40,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${cormorant.variable} ${instrumentSerif.variable} ${newsreader.variable} ${inter.variable}`}
+      className={`${instrumentSerif.variable} ${newsreader.variable} ${inter.variable}`}
     >
       <body suppressHydrationWarning className="font-body">
         {children}

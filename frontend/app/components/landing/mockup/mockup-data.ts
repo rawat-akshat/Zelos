@@ -1,5 +1,3 @@
-export const MOCKUP_NAV = ["Home", "History", "Insights", "Streaks", "Settings"];
-
 export const MOCKUP_FOCUS = {
   title: "Life admin reset",
   progress: 20,

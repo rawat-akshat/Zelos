@@ -7,6 +7,21 @@ import type {
   BlockerType,
 } from "./types";
 
+export const mockUser = {
+  name: "Alex Morgan",
+  email: "alex@example.com",
+  memberSince: new Date("2025-11-01"),
+  plan: "Free" as const,
+};
+
+export const mockProfileAchievements = [
+  { id: "first-session", title: "First Session", unlocked: true },
+  { id: "streak-3", title: "3-Day Streak", unlocked: true },
+  { id: "streak-7", title: "7-Day Streak", unlocked: false },
+  { id: "sessions-10", title: "10 Sessions Completed", unlocked: false },
+  { id: "first-task", title: "First Task Completed", unlocked: true },
+];
+
 export const mockUserStats: UserStats = {
   currentStreak: 7,
   longestStreak: 12,
@@ -16,6 +31,7 @@ export const mockUserStats: UserStats = {
   tasksCompleted: 18,
   focusSessions: 6,
   totalActionsCompleted: 47,
+  totalSessions: 6,
 };
 
 export const mockTodaysFocus: TodaysFocus = {

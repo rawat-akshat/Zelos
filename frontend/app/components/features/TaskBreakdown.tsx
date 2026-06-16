@@ -2,26 +2,35 @@
 
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { RotateCcw, Play, Clock, Check, Layers, AlignLeft, Zap } from "lucide-react";
-import type { TaskResponse, Action } from "@/app/lib/types";
+import { RotateCcw, Play, Clock, Check } from "lucide-react";
+import type { Action } from "../../lib/types";
 
 interface TaskBreakdownProps {
-  response: TaskResponse;
+  explanation: string;
+  actions?: Action[];
+  suggestedQuestions?: string[];
   onStartFocus: (actions: Action[]) => void;
-  onRegenerate: () => void;
+  onTryAnotherApproach: () => void;
+  onFollowUp?: (question: string) => void;
 }
 
 export default function TaskBreakdown({
-  response,
+  explanation,
+  actions: initialActions = [],
+  suggestedQuestions = [],
   onStartFocus,
-  onRegenerate,
+  onTryAnotherApproach,
+  onFollowUp,
 }: TaskBreakdownProps) {
-  const [actions, setActions] = useState<Action[]>(response.actions);
+  const [actions, setActions] = useState<Action[]>(initialActions);
   const [showXP, setShowXP] = useState<Record<string, boolean>>({});
+  const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set());
 
+  const hasActions = actions.length > 0;
+  const hasSuggestedQuestions = suggestedQuestions.length > 0;
   const completedCount = actions.filter((a) => a.completed).length;
   const totalMinutes = actions.reduce((s, a) => s + a.estimatedMinutes, 0);
-  const progressPct = Math.round((completedCount / actions.length) * 100);
+  const progressPct = hasActions ? Math.round((completedCount / actions.length) * 100) : 0;
 
   const toggleAction = useCallback((id: string) => {
     setActions((prev) =>
@@ -31,6 +40,15 @@ export default function TaskBreakdown({
     );
     setShowXP((prev) => ({ ...prev, [id]: true }));
     setTimeout(() => setShowXP((prev) => ({ ...prev, [id]: false })), 1000);
+  }, []);
+
+  const breakDownStep = useCallback((id: string) => {
+    setExpandedSteps((prev) => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
   }, []);
 
   return (
@@ -49,11 +67,11 @@ export default function TaskBreakdown({
         }}
       >
         <p style={{ fontSize: 15, color: "var(--text-secondary)", lineHeight: 1.7, margin: 0 }}>
-          {response.explanation}
+          {explanation}
         </p>
       </div>
 
-      {completedCount > 0 && (
+      {hasActions && completedCount > 0 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -85,60 +103,121 @@ export default function TaskBreakdown({
         </motion.div>
       )}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <p
-          style={{
-            fontSize: 10,
-            fontWeight: 600,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            color: "var(--text-muted)",
-            marginBottom: 12,
-          }}
-        >
-          Micro-actions · {totalMinutes} min total
-        </p>
-        <AnimatePresence initial={false}>
-          {actions.map((action, idx) => (
-            <ActionItem
-              key={action.id}
-              action={action}
-              index={idx}
-              showXP={showXP[action.id]}
-              onToggle={() => toggleAction(action.id)}
-            />
-          ))}
-        </AnimatePresence>
-      </div>
+      {hasActions && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <p
+            style={{
+              fontSize: 10,
+              fontWeight: 600,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--text-muted)",
+              marginBottom: 12,
+            }}
+          >
+            Steps · {totalMinutes} min total
+          </p>
+          <AnimatePresence initial={false}>
+            {actions.map((action, idx) => (
+              <ActionItem
+                key={action.id}
+                action={action}
+                index={idx}
+                showXP={showXP[action.id]}
+                isExpanded={expandedSteps.has(action.id)}
+                onToggle={() => toggleAction(action.id)}
+                onBreakDown={() => breakDownStep(action.id)}
+              />
+            ))}
+          </AnimatePresence>
+        </div>
+      )}
 
-      <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 6 }}>
+      {hasSuggestedQuestions && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <p
+            style={{
+              fontSize: 10,
+              fontWeight: 600,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--text-muted)",
+              margin: 0,
+            }}
+          >
+            Suggested next questions
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {suggestedQuestions.map((question) => (
+              <button
+                key={question}
+                type="button"
+                onClick={() => onFollowUp?.(question)}
+                disabled={!onFollowUp}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  textAlign: "left",
+                  padding: "11px 14px",
+                  borderRadius: "var(--radius-md)",
+                  background: "var(--bg-card)",
+                  border: "1px solid var(--border)",
+                  color: "var(--text-secondary)",
+                  fontSize: 14,
+                  lineHeight: 1.45,
+                  cursor: onFollowUp ? "pointer" : "default",
+                  transition: "all 200ms var(--ease)",
+                  fontFamily: "var(--font-body)",
+                }}
+                onMouseEnter={(e) => {
+                  if (!onFollowUp) return;
+                  e.currentTarget.style.borderColor = "var(--border-accent)";
+                  e.currentTarget.style.color = "var(--text-primary)";
+                  e.currentTarget.style.background = "var(--bg-card-hover)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "var(--border)";
+                  e.currentTarget.style.color = "var(--text-secondary)";
+                  e.currentTarget.style.background = "var(--bg-card)";
+                }}
+              >
+                {question}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: hasActions ? 6 : 0 }}>
+        {hasActions && (
+          <button
+            type="button"
+            onClick={() => onStartFocus(actions)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "11px 20px",
+              borderRadius: 12,
+              background: "var(--accent)",
+              color: "var(--accent-on)",
+              fontSize: 14,
+              fontWeight: 600,
+              border: "none",
+              cursor: "pointer",
+              transition: "all 200ms var(--ease)",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent-hover)")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "var(--accent)")}
+          >
+            <Play size={12} strokeWidth={2.5} fill="currentColor" />
+            Focus
+          </button>
+        )}
+
         <button
-          onClick={() => onStartFocus(actions)}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "11px 20px",
-            borderRadius: 12,
-            background: "var(--accent)",
-            color: "var(--accent-on)",
-            fontSize: 14,
-            fontWeight: 600,
-            border: "none",
-            cursor: "pointer",
-            transition: "all 200ms var(--ease)",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent-hover)")}
-          onMouseLeave={(e) => (e.currentTarget.style.background = "var(--accent)")}
-        >
-          <Play size={12} strokeWidth={2.5} fill="currentColor" />
-          Focus
-        </button>
-
-        <OptionsMenu />
-
-        <button
-          onClick={onRegenerate}
+          type="button"
+          onClick={onTryAnotherApproach}
           style={{
             display: "flex",
             alignItems: "center",
@@ -151,7 +230,7 @@ export default function TaskBreakdown({
             border: "1px solid var(--border)",
             cursor: "pointer",
             transition: "all 180ms var(--ease)",
-            marginLeft: "auto",
+            marginLeft: hasActions ? 0 : 0,
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.color = "var(--text-secondary)";
@@ -163,7 +242,7 @@ export default function TaskBreakdown({
           }}
         >
           <RotateCcw size={11} />
-          Regenerate
+          Try Another Approach
         </button>
       </div>
     </motion.div>
@@ -174,72 +253,118 @@ export function ActionItem({
   action,
   index,
   showXP,
+  isExpanded,
   onToggle,
+  onBreakDown,
 }: {
   action: Action;
   index: number;
   showXP: boolean;
+  isExpanded: boolean;
   onToggle: () => void;
+  onBreakDown: () => void;
 }) {
+  const hasSubSteps = Boolean(action.subSteps?.length);
+  const canBreakDown = hasSubSteps && !isExpanded;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06, duration: 0.22, ease: "easeOut" }}
+      style={{ borderBottom: "1px solid var(--border)" }}
     >
-      <button
-        onClick={onToggle}
-        role="checkbox"
-        aria-checked={action.completed}
-        aria-label={action.description}
+      <div
         style={{
-          width: "100%",
           display: "flex",
           alignItems: "center",
-          gap: 14,
+          gap: 12,
           padding: "14px 4px",
-          background: "transparent",
-          border: "none",
-          borderBottom: "1px solid var(--border)",
-          cursor: "pointer",
-          textAlign: "left",
           position: "relative",
-          transition: "opacity 180ms",
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
-        onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
       >
-        <div
+        <button
+          type="button"
+          onClick={onToggle}
+          role="checkbox"
+          aria-checked={action.completed}
+          aria-label={action.description}
           style={{
-            flexShrink: 0,
-            width: 20,
-            height: 20,
-            borderRadius: 6,
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
-            background: action.completed ? "var(--success)" : "transparent",
-            border: `1.5px solid ${action.completed ? "var(--success)" : "var(--border)"}`,
-            transition: "all 200ms",
-          }}
-        >
-          {action.completed && <Check size={11} color="white" strokeWidth={2.5} />}
-        </div>
-
-        <span
-          style={{
+            gap: 12,
             flex: 1,
-            fontSize: 14,
-            fontWeight: 500,
-            lineHeight: 1.45,
-            color: action.completed ? "var(--success)" : "var(--text-primary)",
-            textDecoration: action.completed ? "line-through" : "none",
-            textDecorationColor: "var(--success-dim)",
-            transition: "all 150ms",
+            minWidth: 0,
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            textAlign: "left",
+            padding: 0,
           }}
         >
-          {action.description}
-        </span>
+          <div
+            style={{
+              flexShrink: 0,
+              width: 20,
+              height: 20,
+              borderRadius: 6,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: action.completed ? "var(--success)" : "transparent",
+              border: `1.5px solid ${action.completed ? "var(--success)" : "var(--border)"}`,
+              transition: "all 200ms",
+            }}
+          >
+            {action.completed && <Check size={11} color="white" strokeWidth={2.5} />}
+          </div>
+
+          <span
+            style={{
+              flex: 1,
+              fontSize: 14,
+              fontWeight: 500,
+              lineHeight: 1.45,
+              color: action.completed ? "var(--success)" : "var(--text-primary)",
+              textDecorationLine: action.completed ? "line-through" : "none",
+              textDecorationColor: action.completed ? "var(--success-dim)" : "transparent",
+              transition: "all 150ms",
+            }}
+          >
+            <span style={{ color: "var(--text-muted)", marginRight: 6 }}>{index + 1}.</span>
+            {action.description}
+          </span>
+        </button>
+
+        {canBreakDown && (
+          <button
+            type="button"
+            onClick={onBreakDown}
+            style={{
+              flexShrink: 0,
+              padding: "5px 10px",
+              borderRadius: 8,
+              border: "1px solid var(--border)",
+              background: "var(--bg-card)",
+              color: "var(--text-muted)",
+              fontSize: 11,
+              fontWeight: 500,
+              cursor: "pointer",
+              transition: "all 180ms var(--ease)",
+              whiteSpace: "nowrap",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "var(--border-accent)";
+              e.currentTarget.style.color = "var(--text-secondary)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "var(--border)";
+              e.currentTarget.style.color = "var(--text-muted)";
+            }}
+          >
+            Break It Down
+          </button>
+        )}
 
         <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
           <Clock size={10} style={{ color: "var(--text-muted)" }} />
@@ -265,163 +390,51 @@ export function ActionItem({
             +5 XP
           </motion.span>
         )}
-      </button>
-    </motion.div>
-  );
-}
-
-const OPTIONS = [
-  { label: "Smaller Steps", sub: "Split into tinier actions", icon: Layers },
-  { label: "More Detail", sub: "Add context and examples", icon: AlignLeft },
-  { label: "Faster Version", sub: "Quick 2-minute version", icon: Zap },
-];
-
-export function OptionsMenu() {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div style={{ position: "relative" }}>
-      <button
-        onClick={() => setOpen((o) => !o)}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          padding: "11px 16px",
-          borderRadius: 12,
-          background: open ? "var(--nav-hover-bg)" : "transparent",
-          color: open ? "var(--text-secondary)" : "var(--text-muted)",
-          fontSize: 13,
-          border: "1px solid var(--border)",
-          cursor: "pointer",
-          transition: "all 180ms var(--ease)",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.color = "var(--text-secondary)";
-          e.currentTarget.style.background = "var(--nav-hover-bg)";
-        }}
-        onMouseLeave={(e) => {
-          if (!open) {
-            e.currentTarget.style.color = "var(--text-muted)";
-            e.currentTarget.style.background = "transparent";
-          }
-        }}
-        aria-label="Adjust response"
-      >
-        Adjust
-        <svg
-          width="11"
-          height="11"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          style={{
-            transform: open ? "rotate(180deg)" : "none",
-            transition: "transform 180ms",
-          }}
-        >
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
-      </button>
+      </div>
 
       <AnimatePresence>
-        {open && (
-          <>
-            <div
-              style={{ position: "fixed", inset: 0, zIndex: 9 }}
-              onClick={() => setOpen(false)}
-            />
-            <motion.div
-              initial={{ opacity: 0, y: -6, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -4, scale: 0.97 }}
-              transition={{ duration: 0.14 }}
+        {isExpanded && action.subSteps && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            style={{ overflow: "hidden", paddingLeft: 32, paddingBottom: 12 }}
+          >
+            <ul
               style={{
-                position: "absolute",
-                bottom: "calc(100% + 8px)",
-                left: 0,
-                zIndex: 10,
-                borderRadius: 14,
-                background: "var(--bg-card)",
-                border: "1px solid var(--border)",
-                boxShadow: "var(--shadow-lg)",
-                minWidth: 220,
-                overflow: "hidden",
-                padding: "8px",
+                listStyle: "none",
+                margin: 0,
+                padding: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
               }}
             >
-              <p
-                style={{
-                  fontSize: 10,
-                  fontWeight: 600,
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  color: "var(--text-muted)",
-                  padding: "6px 10px 4px",
-                }}
-              >
-                Adjust response
-              </p>
-              {OPTIONS.map(({ label, sub, icon: Icon }) => (
-                <button
-                  key={label}
-                  onClick={() => setOpen(false)}
+              {action.subSteps.map((step) => (
+                <li
+                  key={step}
                   style={{
-                    width: "100%",
                     display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    padding: "10px",
-                    borderRadius: 10,
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    transition: "background 120ms",
+                    alignItems: "flex-start",
+                    gap: 8,
+                    fontSize: 13,
+                    lineHeight: 1.45,
+                    color: "var(--text-secondary)",
                   }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = "var(--nav-hover-bg)")
-                  }
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                 >
-                  <div
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 8,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      background: "var(--accent-glow)",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <Icon size={14} style={{ color: "var(--text-muted)" }} />
-                  </div>
-                  <div>
-                    <p
-                      style={{
-                        fontSize: 13,
-                        color: "var(--text-primary)",
-                        fontWeight: 500,
-                        margin: 0,
-                      }}
-                    >
-                      {label}
-                    </p>
-                    <p style={{ fontSize: 11, color: "var(--text-muted)", margin: 0 }}>
-                      {sub}
-                    </p>
-                  </div>
-                </button>
+                  <Check
+                    size={12}
+                    style={{ color: "var(--accent)", flexShrink: 0, marginTop: 2 }}
+                    strokeWidth={2}
+                  />
+                  {step}
+                </li>
               ))}
-            </motion.div>
-          </>
+            </ul>
+          </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }

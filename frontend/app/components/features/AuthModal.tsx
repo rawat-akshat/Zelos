@@ -91,10 +91,10 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
               className="font-heading"
               style={{
                 fontSize: 22,
-                fontWeight: 400,
                 color: "var(--text-primary)",
                 textAlign: "center",
                 marginBottom: 8,
+                letterSpacing: "-0.028em",
               }}
             >
               Save your progress

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import { ArrowUp, Loader2, Paperclip, Mic } from "lucide-react";
 
 const PLACEHOLDERS = [
@@ -11,25 +11,73 @@ const PLACEHOLDERS = [
   "What have you been avoiding?",
 ];
 
+const MIN_ROWS = 2;
+const MAX_ROWS = 5;
+const LINE_HEIGHT = 24; // 15px × 1.6
+const MIN_TEXT_HEIGHT = LINE_HEIGHT * MIN_ROWS;
+const MAX_TEXT_HEIGHT = LINE_HEIGHT * MAX_ROWS;
+
 interface TaskInputProps {
   onSubmit: (text: string) => void;
   loading?: boolean;
-  initialValue?: string;
+  value?: string;
+  onValueChange?: (value: string) => void;
+  focusKey?: number;
 }
+
+const textareaStyle: React.CSSProperties = {
+  display: "block",
+  width: "100%",
+  resize: "none",
+  background: "transparent",
+  outline: "none",
+  padding: "0 8px 0 0",
+  fontSize: 15,
+  lineHeight: 1.6,
+  color: "var(--text-primary)",
+  caretColor: "var(--accent)",
+  fontFamily: "var(--font-body)",
+  border: "none",
+  scrollPaddingTop: 4,
+  scrollPaddingBottom: 4,
+};
 
 export default function TaskInput({
   onSubmit,
   loading = false,
-  initialValue = "",
+  value: controlledValue,
+  onValueChange,
+  focusKey = 0,
 }: TaskInputProps) {
-  const [value, setValue] = useState(() => initialValue);
+  const [internalValue, setInternalValue] = useState("");
+  const isControlled = controlledValue !== undefined;
+  const value = isControlled ? controlledValue : internalValue;
+  const setValue = (next: string) => {
+    if (isControlled) onValueChange?.(next);
+    else setInternalValue(next);
+  };
   const [focused, setFocused] = useState(false);
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const syncHeight = useCallback(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+
+    el.style.height = "0px";
+    const scrollHeight = el.scrollHeight;
+    const nextHeight = Math.min(Math.max(scrollHeight, MIN_TEXT_HEIGHT), MAX_TEXT_HEIGHT);
+    el.style.height = `${nextHeight}px`;
+    el.style.overflowY = scrollHeight > MAX_TEXT_HEIGHT ? "auto" : "hidden";
+  }, []);
+
+  useLayoutEffect(() => {
+    syncHeight();
+  }, [value, syncHeight]);
+
   useEffect(() => {
-    if (initialValue) textareaRef.current?.focus();
-  }, [initialValue]);
+    if (focusKey > 0) textareaRef.current?.focus();
+  }, [focusKey]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -58,7 +106,6 @@ export default function TaskInput({
   return (
     <div
       style={{
-        position: "relative",
         borderRadius: "var(--radius-card)",
         background: "var(--bg-input)",
         border: focused
@@ -68,45 +115,44 @@ export default function TaskInput({
           : "1px solid var(--border)",
         boxShadow: focused ? "var(--input-shadow-focus)" : "var(--input-shadow)",
         transition: "border-color 200ms var(--ease), box-shadow 200ms var(--ease)",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      <textarea
-        ref={textareaRef}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        onKeyDown={handleKeyDown}
-        placeholder={PLACEHOLDERS[placeholderIdx]}
-        rows={2}
-        disabled={loading}
+      <div
         style={{
-          display: "block",
-          width: "100%",
-          resize: "none",
-          background: "transparent",
-          outline: "none",
-          padding: "14px 18px 44px",
-          fontSize: 15,
-          lineHeight: 1.6,
-          color: "var(--text-primary)",
-          caretColor: "var(--accent)",
-          opacity: loading ? 0.6 : 1,
-          fontFamily: "var(--font-body)",
+          padding: "14px 14px 8px 18px",
+          flexShrink: 0,
         }}
-        aria-label="Describe what you're stuck on"
-      />
+      >
+        <textarea
+          ref={textareaRef}
+          className="task-input-textarea"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          onKeyDown={handleKeyDown}
+          placeholder={PLACEHOLDERS[placeholderIdx]}
+          rows={MIN_ROWS}
+          disabled={loading}
+          style={{
+            ...textareaStyle,
+            minHeight: MIN_TEXT_HEIGHT,
+            maxHeight: MAX_TEXT_HEIGHT,
+            opacity: loading ? 0.6 : 1,
+          }}
+          aria-label="Describe what you're stuck on"
+        />
+      </div>
 
       <div
         style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           padding: "0 12px 12px",
+          flexShrink: 0,
         }}
       >
         <button

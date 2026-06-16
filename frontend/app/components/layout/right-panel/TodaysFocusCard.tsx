@@ -9,7 +9,7 @@ export default function TodaysFocusCard() {
   return (
     <PanelCard accent>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--accent)" }}>
+        <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--accent)" }}>
           Today&apos;s Focus
         </p>
         <span
@@ -26,7 +26,7 @@ export default function TodaysFocusCard() {
         </span>
       </div>
 
-      <p style={{ fontSize: 16, fontWeight: 600, color: "var(--text-primary)", marginBottom: 6 }}>
+      <p style={{ fontSize: 16, fontWeight: 500, color: "var(--text-primary)", marginBottom: 6 }}>
         {focus.title}
       </p>
       <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 16 }}>

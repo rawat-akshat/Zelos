@@ -10,7 +10,8 @@
   --radius-card: 18px;
   --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
-  --font-heading: var(--font-cormorant), "Fraunces", Georgia, serif;
+  --font-heading: var(--font-newsreader), var(--font-instrument-serif), Georgia, serif;
+  --font-landing-heading: var(--font-heading);
   --font-body: var(--font-inter), system-ui, sans-serif;
 
   /* Palette */
@@ -91,8 +92,11 @@ body {
   overflow-x: hidden;
 }
 
-.font-heading {
+.font-heading,
+.font-landing-heading {
   font-family: var(--font-heading);
+  font-weight: 500;
+  letter-spacing: -0.04em;
 }
 
 .font-body {
@@ -109,6 +113,27 @@ body {
 ::-webkit-scrollbar-thumb {
   background: var(--scrollbar);
   border-radius: 2px;
+}
+
+.task-input-textarea {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar) transparent;
+}
+
+.task-input-textarea::-webkit-scrollbar {
+  width: 6px;
+}
+
+.task-input-textarea::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 6px 0;
+}
+
+.task-input-textarea::-webkit-scrollbar-thumb {
+  background: var(--scrollbar);
+  border-radius: 99px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 
 :focus-visible {
@@ -209,18 +234,12 @@ body {
   --landing-border-focus: rgba(201, 167, 92, 0.55);
   --landing-shadow: 0 4px 24px rgba(30, 30, 30, 0.06);
   --landing-error: #C45C5C;
-  --font-landing-heading: var(--font-newsreader), var(--font-instrument-serif), Georgia, serif;
+  --font-landing-heading: var(--font-heading);
   background: var(--landing-bg);
   color: var(--landing-text);
   min-height: 100vh;
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
-}
-
-.landing-page .font-landing-heading {
-  font-family: var(--font-landing-heading);
-  font-weight: 500;
-  letter-spacing: -0.04em;
 }
 
 .landing-display {

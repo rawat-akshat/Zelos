@@ -16,7 +16,7 @@ export default function XPCard() {
             alignItems: "center",
             gap: 4,
             fontSize: 10,
-            fontWeight: 700,
+            fontWeight: 600,
             padding: "3px 10px",
             borderRadius: 99,
             background: "var(--accent-glow)",
@@ -31,7 +31,7 @@ export default function XPCard() {
       <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 16 }}>
         <span
           className="font-heading"
-          style={{ fontSize: 36, fontWeight: 400, color: "var(--text-primary)", lineHeight: 1 }}
+          style={{ fontSize: 36, color: "var(--text-primary)", lineHeight: 1, letterSpacing: "-0.04em" }}
         >
           {totalXP}
         </span>

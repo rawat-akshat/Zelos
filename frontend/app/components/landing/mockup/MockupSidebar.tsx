@@ -1,4 +1,4 @@
-import { MOCKUP_NAV } from "./mockup-data";
+import { NAV_ITEMS } from "@/app/components/layout/nav-config";
 
 export default function MockupSidebar() {
   return (
@@ -12,45 +12,46 @@ export default function MockupSidebar() {
         flexDirection: "column",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 22 }}>
-        <div
-          style={{
-            width: 22,
-            height: 22,
-            borderRadius: 6,
-            background: "rgba(201, 168, 90, 0.15)",
-            border: "1px solid rgba(201, 168, 90, 0.3)",
-          }}
-        />
+      <div style={{ marginBottom: 22, textAlign: "center" }}>
         <span
+          className="font-heading"
           style={{
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: "0.08em",
+            fontSize: 16,
+            letterSpacing: "-0.02em",
             color: "#2A2723",
-            fontFamily: "var(--font-cormorant), Georgia, serif",
           }}
         >
-          ZELOS
+          Zelos
         </span>
       </div>
 
       <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        {MOCKUP_NAV.map((label, i) => (
-          <div
-            key={label}
-            style={{
-              fontSize: 10,
-              fontWeight: i === 0 ? 500 : 400,
-              color: i === 0 ? "#C9A85A" : "#9A9388",
-              background: i === 0 ? "rgba(201, 168, 90, 0.1)" : "transparent",
-              borderRadius: 8,
-              padding: "7px 10px",
-            }}
-          >
-            {label}
-          </div>
-        ))}
+        {NAV_ITEMS.map(({ icon: Icon, label }, i) => {
+          const active = i === 0;
+          return (
+            <div
+              key={label}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                fontSize: 10,
+                fontWeight: active ? 500 : 400,
+                color: active ? "#C9A85A" : "#9A9388",
+                background: active ? "rgba(201, 168, 90, 0.1)" : "transparent",
+                borderRadius: 8,
+                padding: "7px 10px",
+              }}
+            >
+              <Icon
+                size={12}
+                strokeWidth={active ? 2 : 1.75}
+                style={{ flexShrink: 0, color: active ? "#C9A85A" : "inherit" }}
+              />
+              {label}
+            </div>
+          );
+        })}
       </nav>
     </div>
   );

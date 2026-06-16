@@ -2,10 +2,12 @@
 
 import Sidebar from "./Sidebar";
 import RightPanel from "./RightPanel";
-import { Menu, Zap } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useState } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { NAV_ITEMS, NAV_PAGE_TITLES } from "./nav-config";
+import NavItem from "./NavItem";
+import LandingBackground from "../landing/LandingBackground";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -15,15 +17,8 @@ export default function AppShell({ children }: AppShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  const pageTitle = (() => {
-    if (pathname === "/dashboard") return "Home";
-    if (pathname === "/history") return "History";
-    if (pathname === "/insights") return "Insights";
-    if (pathname === "/streaks") return "Streaks";
-    if (pathname === "/achievements") return "Achievements";
-    if (pathname === "/settings") return "Settings";
-    return "Zelos";
-  })();
+  const pageTitle = NAV_PAGE_TITLES[pathname] ?? "Zelos";
+  const isWorkspace = pathname === "/dashboard";
 
   return (
     <div className="flex min-h-screen" style={{ background: "var(--bg-base)" }}>
@@ -38,17 +33,11 @@ export default function AppShell({ children }: AppShellProps) {
         }}
       >
         <div className="flex items-center gap-2">
-          <div
-            className="w-6 h-6 rounded-md flex items-center justify-center"
-            style={{ background: "var(--accent-glow)" }}
-          >
-            <Zap size={12} strokeWidth={2.5} style={{ color: "var(--accent)" }} />
-          </div>
           <span
-            className="font-heading text-sm tracking-widest"
-            style={{ color: "var(--text-primary)", fontWeight: 700 }}
+            className="font-heading"
+            style={{ fontSize: 20, color: "var(--text-primary)", letterSpacing: "-0.02em" }}
           >
-            ZELOS
+            Zelos
           </span>
         </div>
         <span className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
@@ -81,36 +70,23 @@ export default function AppShell({ children }: AppShellProps) {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {[
-              { href: "/dashboard", label: "Home" },
-              { href: "/history", label: "History" },
-              { href: "/insights", label: "Insights" },
-              { href: "/streaks", label: "Streaks" },
-              { href: "/achievements", label: "Achievements" },
-              { href: "/settings", label: "Settings" },
-            ].map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-3 rounded-[10px] text-sm transition-colors"
-                style={{
-                  color: pathname === href ? "var(--accent)" : "var(--text-secondary)",
-                  background:
-                    pathname === href ? "var(--nav-active-bg)" : "transparent",
-                }}
-              >
-                {label}
-              </Link>
+            {NAV_ITEMS.map((item) => (
+              <NavItem
+                key={item.href}
+                {...item}
+                active={pathname === item.href}
+                onNavigate={() => setMobileMenuOpen(false)}
+              />
             ))}
           </nav>
         </div>
       )}
 
       <main
-        className="flex-1 min-h-screen pt-12 lg:pt-0"
+        className="flex-1 min-h-screen pt-12 lg:pt-0 relative"
         style={{ marginLeft: 0, marginRight: 0 }}
       >
+        <LandingBackground scoped />
         <style>{`
           @media (min-width: 1024px) {
             main {
@@ -119,14 +95,14 @@ export default function AppShell({ children }: AppShellProps) {
           }
           @media (min-width: 1280px) {
             main {
-              margin-right: 340px !important;
+              margin-right: ${isWorkspace ? "340px" : "0"} !important;
             }
           }
         `}</style>
-        {children}
+        <div style={{ position: "relative", zIndex: 1 }}>{children}</div>
       </main>
 
-      <RightPanel />
+      {isWorkspace && <RightPanel />}
     </div>
   );
 }

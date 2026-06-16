@@ -1,12 +1,12 @@
 /**
  * Subtle journal-style line art for landing pages (~5% opacity).
  */
-export default function LandingBackground() {
+export default function LandingBackground({ scoped = false }: { scoped?: boolean }) {
   return (
     <div
       aria-hidden
       style={{
-        position: "fixed",
+        position: scoped ? "absolute" : "fixed",
         inset: 0,
         overflow: "hidden",
         pointerEvents: "none",

@@ -1,21 +1,32 @@
 "use client";
 
 import { motion } from "framer-motion";
-
-const STEPS = [
-  "Analyzing what's blocking you…",
-  "Breaking the task into actions…",
-  "Creating your first step…",
-];
+import {
+  PROMPT_LOADING_STEPS,
+  PROMPT_LOADING_VARIANT,
+  type PromptLoadingVariant,
+} from "@/app/lib/loading-config";
 
 interface LoadingStepsProps {
-  activeStep: number;
+  activeStep?: number;
+  variant?: PromptLoadingVariant;
 }
 
-export default function LoadingSteps({ activeStep }: LoadingStepsProps) {
+export default function LoadingSteps({
+  activeStep = 0,
+  variant = PROMPT_LOADING_VARIANT,
+}: LoadingStepsProps) {
+  if (variant === "simple") {
+    return (
+      <p style={{ fontSize: 14, color: "var(--text-muted)", fontStyle: "italic" }}>
+        Thinking…
+      </p>
+    );
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      {STEPS.map((step, i) => (
+      {PROMPT_LOADING_STEPS.map((step, i) => (
         <motion.div
           key={step}
           initial={{ opacity: 0, x: -8 }}

@@ -21,15 +21,9 @@ const config: Config = {
         success: "var(--success)",
       },
       fontFamily: {
-        sans: [
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "SF Pro Display",
-          "Segoe UI",
-          "Helvetica Neue",
-          "Arial",
-          "sans-serif",
-        ],
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        body: ["var(--font-inter)", "system-ui", "sans-serif"],
+        heading: ["var(--font-heading)"],
       },
       borderRadius: {
         DEFAULT: "var(--radius-md)",

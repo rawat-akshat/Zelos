@@ -16,7 +16,7 @@ export default function StreakCard() {
       <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 16 }}>
         <span
           className="font-heading"
-          style={{ fontSize: 36, fontWeight: 400, color: "var(--text-primary)", lineHeight: 1 }}
+          style={{ fontSize: 36, color: "var(--text-primary)", lineHeight: 1, letterSpacing: "-0.04em" }}
         >
           {currentStreak}
         </span>

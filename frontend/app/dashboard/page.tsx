@@ -5,23 +5,46 @@ import { motion, AnimatePresence } from "framer-motion";
 import AppShell from "../components/layout/AppShell";
 import TaskInput from "../components/features/TaskInput";
 import TaskBreakdown from "../components/features/TaskBreakdown";
-import LearnMode from "../components/features/LearnMode";
 import FocusMode from "../components/features/FocusMode";
 import AuthModal from "../components/features/AuthModal";
 import CenterHero from "../components/features/CenterHero";
-import EditorialAccents from "../components/features/EditorialAccents";
 import UserBubble from "../components/features/UserBubble";
 import SuggestionCards from "../components/features/SuggestionCards";
 import LoadingSteps from "../components/features/LoadingSteps";
 import { TaskBreakdownSkeleton } from "../components/ui/Skeleton";
 import { generateMockResponse } from "../lib/mock-ai";
-import type { AIResponse, TaskResponse, LearnResponse, Action } from "../lib/types";
+import { PROMPT_LOADING_VARIANT, SHOW_BREAKDOWN_SKELETON } from "../lib/loading-config";
+import type { AIResponse, Action } from "../lib/types";
+
+function getResponseContent(response: AIResponse) {
+  if (response.mode === "task") {
+    return {
+      explanation: response.explanation,
+      actions: response.actions,
+      suggestedQuestions: response.suggestedQuestions ?? [],
+    };
+  }
+  if (response.mode === "learn") {
+    return {
+      explanation: response.explanation,
+      actions: response.actions ?? [],
+      suggestedQuestions: response.suggestedQuestions ?? [],
+    };
+  }
+  return {
+    explanation: response.task.explanation,
+    actions: response.task.actions,
+    suggestedQuestions: response.task.suggestedQuestions ?? response.learn.suggestedQuestions ?? [],
+  };
+}
 
 type CenterState = "home" | "loading" | "result";
 
 export default function DashboardPage() {
   const [centerState, setCenterState] = useState<CenterState>("home");
   const [inFocusMode, setInFocusMode] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const [inputFocusKey, setInputFocusKey] = useState(0);
   const [promptText, setPromptText] = useState("");
   const [response, setResponse] = useState<AIResponse | null>(null);
   const [focusActions, setFocusActions] = useState<Action[]>([]);
@@ -36,18 +59,21 @@ export default function DashboardPage() {
     }
   }, [centerState, response]);
 
-  const handleSubmit = useCallback(async (text: string) => {
+  const handleSubmit = useCallback(async (text: string, options?: { alternative?: boolean }) => {
     setPromptText(text);
     setCenterState("loading");
     setLoadingStep(0);
 
-    const stepInterval = setInterval(() => {
-      setLoadingStep((s) => Math.min(s + 1, 2));
-    }, 600);
+    const stepInterval =
+      PROMPT_LOADING_VARIANT === "steps"
+        ? setInterval(() => {
+            setLoadingStep((s) => Math.min(s + 1, 2));
+          }, 600)
+        : null;
 
     try {
-      const result = await generateMockResponse(text);
-      clearInterval(stepInterval);
+      const result = await generateMockResponse(text, options);
+      if (stepInterval) clearInterval(stepInterval);
       setResponse(result);
       setCenterState("result");
 
@@ -56,15 +82,21 @@ export default function DashboardPage() {
         setTimeout(() => setShowAuth(true), 2200);
       }
     } catch {
-      clearInterval(stepInterval);
+      if (stepInterval) clearInterval(stepInterval);
       setCenterState("home");
     }
+  }, []);
+
+  const handleSuggestionSelect = useCallback((text: string) => {
+    setInputValue(text);
+    setInputFocusKey((k) => k + 1);
   }, []);
 
   const handleNewTask = useCallback(() => {
     setCenterState("home");
     setResponse(null);
     setPromptText("");
+    setInputValue("");
   }, []);
 
   return (
@@ -80,8 +112,6 @@ export default function DashboardPage() {
       <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
 
       <div style={{ display: "flex", flexDirection: "column", height: "100vh", position: "relative" }}>
-
-        <EditorialAccents />
 
         <AnimatePresence mode="wait">
           {centerState === "home" && (
@@ -111,7 +141,7 @@ export default function DashboardPage() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.22 }}
                 >
-                  <SuggestionCards onSelect={handleSubmit} />
+                  <SuggestionCards onSelect={handleSuggestionSelect} />
                 </motion.div>
               )}
 
@@ -126,7 +156,7 @@ export default function DashboardPage() {
                 >
                   <UserBubble text={promptText} />
                   <LoadingSteps activeStep={loadingStep} />
-                  <TaskBreakdownSkeleton />
+                  {SHOW_BREAKDOWN_SKELETON && <TaskBreakdownSkeleton />}
                 </motion.div>
               )}
 
@@ -141,19 +171,16 @@ export default function DashboardPage() {
                 >
                   <UserBubble text={promptText} />
 
-                  {response.mode === "task" && (
-                    <TaskBreakdown
-                      response={response as TaskResponse}
-                      onStartFocus={(actions) => { setFocusActions(actions); setInFocusMode(true); }}
-                      onRegenerate={() => handleSubmit(promptText)}
-                    />
-                  )}
-                  {response.mode === "learn" && (
-                    <LearnMode
-                      response={response as LearnResponse}
-                      onFollowUp={(q) => handleSubmit(q)}
-                    />
-                  )}
+                  <TaskBreakdown
+                    key={response.sessionId}
+                    {...getResponseContent(response)}
+                    onStartFocus={(actions) => {
+                      setFocusActions(actions);
+                      setInFocusMode(true);
+                    }}
+                    onTryAnotherApproach={() => handleSubmit(promptText, { alternative: true })}
+                    onFollowUp={handleSubmit}
+                  />
 
                   <div style={{ textAlign: "center" }}>
                     <button
@@ -185,7 +212,13 @@ export default function DashboardPage() {
           }}
         >
           <div style={{ maxWidth: 720, margin: "0 auto", width: "100%" }}>
-            <TaskInput onSubmit={handleSubmit} />
+            <TaskInput
+              value={inputValue}
+              onValueChange={setInputValue}
+              focusKey={inputFocusKey}
+              onSubmit={handleSubmit}
+              loading={centerState === "loading"}
+            />
           </div>
         </div>
 

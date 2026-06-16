@@ -34,10 +34,10 @@ export default function PageContent({
             className="font-heading"
             style={{
               fontSize: 36,
-              fontWeight: 400,
               color: "var(--text-primary)",
               marginBottom: subtitle ? 12 : 0,
-              letterSpacing: "-0.01em",
+              letterSpacing: "-0.038em",
+              lineHeight: 1.08,
             }}
           >
             {title}

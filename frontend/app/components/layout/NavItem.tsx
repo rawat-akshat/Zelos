@@ -3,12 +3,14 @@ import type { NavConfig } from "./nav-config";
 
 interface NavItemProps extends NavConfig {
   active: boolean;
+  onNavigate?: () => void;
 }
 
-export default function NavItem({ href, icon: Icon, label, active }: NavItemProps) {
+export default function NavItem({ href, icon: Icon, label, active, onNavigate }: NavItemProps) {
   return (
     <Link
       href={href}
+      onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       style={{
         display: "flex",

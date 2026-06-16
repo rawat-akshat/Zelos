@@ -1,7 +1,6 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Zap } from "lucide-react";
 import { NAV_ITEMS } from "./nav-config";
 import NavItem from "./NavItem";
 
@@ -31,35 +30,18 @@ export default function Sidebar() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: "12px",
           flexShrink: 0,
         }}
       >
-        <div
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 12,
-            background: "var(--accent-glow)",
-            border: "1px solid var(--border-accent)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-        >
-          <Zap size={20} strokeWidth={2.5} style={{ color: "var(--accent)" }} />
-        </div>
         <span
           className="font-heading"
           style={{
-            fontSize: 22,
-            fontWeight: 700,
+            fontSize: 32,
             color: "var(--text-primary)",
-            letterSpacing: "0.08em",
+            letterSpacing: "-0.02em",
           }}
         >
-          ZELOS
+          Zelos
         </span>
       </div>
 
