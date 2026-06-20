@@ -123,6 +123,8 @@ class SessionUpdateStatus(BaseModel):
 
 
 class SessionResponseV3(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
     id: UUID
     user_id: UUID
     title: Optional[str] = None
@@ -178,6 +180,8 @@ class MessageCreateV3(BaseModel):
 
 
 class MessageResponseV3(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
     id: UUID
     session_id: UUID
     user_id: UUID
@@ -186,6 +190,27 @@ class MessageResponseV3(BaseModel):
     mode: Optional[str] = None
     metadata: Optional[MessageMetadata] = None
     created_at: datetime
+
+
+class SendMessageRequest(BaseModel):
+    content: str = Field(..., min_length=1, max_length=10000)
+    mode: Optional[CoachMode] = None
+
+
+class ChatTurnResponse(BaseModel):
+    user_message: MessageResponseV3
+    assistant_message: MessageResponseV3
+
+
+class SessionTitleUpdate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+
+
+class ProfileFactUpsert(BaseModel):
+    key: str = Field(..., min_length=1, max_length=100)
+    value: str = Field(..., min_length=1, max_length=2000)
+    confidence: float = Field(default=0.7, ge=0, le=1)
+    source_session_id: Optional[UUID] = None
 
 
 # ---------------------------------------------------------------------------
@@ -335,6 +360,8 @@ class CandidatePatternResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 class LLMContextResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
     user_profile_summary: str = ""
     user_facts: List[UserFact] = Field(default_factory=list)
     preferred_tone: str = "supportive"

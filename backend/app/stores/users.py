@@ -3,7 +3,7 @@ from typing import Any, Optional
 from app.core.database import db
 
 
-class UserRepository:
+class UserStore:
     @property
     def _admin(self):
         return db.admin_client
@@ -54,4 +54,4 @@ class UserRepository:
         return result.data[0]
 
 
-user_repo = UserRepository()
+users = UserStore()

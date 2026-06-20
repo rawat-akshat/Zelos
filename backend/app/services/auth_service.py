@@ -1,9 +1,9 @@
 from typing import Any, Optional
 
 from app.core.database import db
-from app.repositories.playbook_repo import playbook_repo
-from app.repositories.profile_repo import profile_repo
-from app.repositories.user_repo import user_repo
+from app.stores.playbooks import playbooks
+from app.stores.profiles import profiles
+from app.stores.users import users
 from app.utils.auth import create_access_token
 
 
@@ -43,13 +43,13 @@ class AuthService:
         if not email:
             raise ValueError("Supabase user has no email")
 
-        existing = user_repo.get_by_id(user_id)
+        existing = users.get_by_id(user_id)
 
         if existing:
             user = existing
         else:
             provider, provider_id = _extract_provider(supabase_user)
-            user = user_repo.create(
+            user = users.create(
                 user_id=user_id,
                 email=email,
                 name=_extract_name(supabase_user),
@@ -58,11 +58,11 @@ class AuthService:
                 auth_provider_id=provider_id,
             )
 
-        if not profile_repo.get_by_user_id(user_id):
-            profile_repo.create_empty(user_id)
+        if not profiles.get_by_user_id(user_id):
+            profiles.create_empty(user_id)
 
-        if not playbook_repo.get_by_user_id(user_id):
-            playbook_repo.create_empty(user_id)
+        if not playbooks.get_by_user_id(user_id):
+            playbooks.create_empty(user_id)
 
         return user
 
@@ -79,7 +79,7 @@ class AuthService:
         }
 
     def get_me(self, user_id: str) -> dict[str, Any]:
-        user = user_repo.get_by_id(user_id)
+        user = users.get_by_id(user_id)
         if not user:
             raise LookupError("User not found")
         return user

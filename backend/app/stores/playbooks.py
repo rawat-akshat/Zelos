@@ -3,7 +3,7 @@ from typing import Any, Optional
 from app.core.database import db
 
 
-class UserPlaybookRepository:
+class PlaybookStore:
     @property
     def _admin(self):
         return db.admin_client
@@ -30,5 +30,16 @@ class UserPlaybookRepository:
             raise RuntimeError("Failed to create user playbook")
         return result.data[0]
 
+    def update(self, user_id: str, updates: dict[str, Any]) -> dict[str, Any]:
+        result = (
+            self._admin.table("user_playbooks")
+            .update(updates)
+            .eq("user_id", user_id)
+            .execute()
+        )
+        if not result.data:
+            raise LookupError("User playbook not found")
+        return result.data[0]
 
-playbook_repo = UserPlaybookRepository()
+
+playbooks = PlaybookStore()

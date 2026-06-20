@@ -1,48 +1,33 @@
 """
-API V1 Router
-
-Collects all v1 endpoints and registers them.
+API V1 Router — V3 behavioral coach backend.
 """
 
 from fastapi import APIRouter
-from app.api.v1.endpoints import auth, sessions, messages, actions, breakdown, feedback, streaks
 
-# Create main API router
+from app.api.v1.endpoints import (
+    auth,
+    context,
+    focus_sessions,
+    interventions,
+    messages,
+    patterns,
+    playbook,
+    profile,
+    sessions,
+)
+
 router = APIRouter()
 
-# Include all endpoint routers
+router.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+router.include_router(sessions.router, prefix="/sessions", tags=["Sessions"])
+router.include_router(messages.router, prefix="/sessions", tags=["Messages"])
+router.include_router(patterns.router, prefix="/patterns", tags=["Patterns"])
 router.include_router(
-    auth.router,
-    prefix="/auth",
-    tags=["Authentication"]
+    interventions.router, prefix="/interventions", tags=["Interventions"]
 )
 router.include_router(
-    sessions.router,
-    prefix="/sessions",
-    tags=["Sessions"]
+    focus_sessions.router, prefix="/focus-sessions", tags=["Focus Sessions"]
 )
-router.include_router(
-    messages.router,
-    prefix="/messages",
-    tags=["Messages"]
-)
-router.include_router(
-    actions.router,
-    prefix="/actions",
-    tags=["Actions"]
-)
-router.include_router(
-    breakdown.router,
-    prefix="/breakdown",
-    tags=["AI Breakdown"]
-)
-router.include_router(
-    feedback.router,
-    prefix="/feedback",
-    tags=["Feedback"]
-)
-router.include_router(
-    streaks.router,
-    prefix="/streaks",
-    tags=["Streaks & Stats"]
-)
+router.include_router(profile.router, prefix="/profile", tags=["Profile"])
+router.include_router(playbook.router, prefix="/playbook", tags=["Playbook"])
+router.include_router(context.router, prefix="/context", tags=["Context"])

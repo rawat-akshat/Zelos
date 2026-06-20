@@ -24,7 +24,7 @@ Repositories (Supabase/Postgres only)
 Supabase Postgres
 ```
 
-**Architecture rule:** API routes → services → repositories. No direct `db.client.table(...)` calls inside endpoints.
+**Architecture rule:** API routes → services → stores. No direct `db.client.table(...)` calls inside endpoints.
 
 ---
 
@@ -34,13 +34,13 @@ Supabase Postgres
 backend/app/
   api/v1/endpoints/     # thin routes only
   models/schemas.py     # Pydantic request/response
-  repositories/         # all Supabase queries
-    user_repo.py
-    session_repo.py
-    message_repo.py
-    pattern_repo.py
-    focus_repo.py
-    profile_repo.py
+  stores/               # database access (one file per entity)
+    users.py
+    sessions.py
+    messages.py
+    patterns.py
+    focus_sessions.py
+    profiles.py
   services/             # business logic
     session_service.py
     chat_service.py
@@ -61,7 +61,7 @@ backend/app/
 
 ### 0.1 Add new folders
 
-Create `repositories/`, `services/`, and `llm/` under `backend/app/`.
+Create `stores/`, `services/`, and `llm/` under `backend/app/`.
 
 ### 0.2 Unregister legacy routes
 
@@ -205,7 +205,7 @@ Create `users` row + empty `user_profiles` + empty `user_playbooks` if missing.
 | POST | `/sessions/{id}/open` | Set `opened_at`, create `session_activity_logs` row |
 | POST | `/sessions/{id}/close` | Close log, compute duration, increment `total_time_spent_seconds` |
 
-Implement via `session_service` + `session_repo`.
+Implement via `session_service` + `sessions` store.
 
 ---
 
