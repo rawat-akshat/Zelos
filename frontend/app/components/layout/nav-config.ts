@@ -1,9 +1,9 @@
 import {
   LayoutGrid,
-  Clock,
+  Target,
+  Lightbulb,
   User,
   Settings,
-  HelpCircle,
   LucideIcon,
 } from "lucide-react";
 
@@ -15,16 +15,16 @@ export interface NavConfig {
 
 export const NAV_ITEMS: NavConfig[] = [
   { href: "/dashboard", icon: LayoutGrid, label: "Workspace" },
-  { href: "/sessions", icon: Clock, label: "My Sessions" },
+  { href: "/goals", icon: Target, label: "Goals" },
+  { href: "/insights", icon: Lightbulb, label: "Insights" },
   { href: "/profile", icon: User, label: "Profile" },
   { href: "/settings", icon: Settings, label: "Settings" },
-  { href: "/support", icon: HelpCircle, label: "Help" },
 ];
 
 export const NAV_PAGE_TITLES: Record<string, string> = {
   "/dashboard": "Workspace",
-  "/sessions": "My Sessions",
+  "/goals": "Goals",
+  "/insights": "Insights",
   "/profile": "Profile",
   "/settings": "Settings",
-  "/support": "Help",
 };

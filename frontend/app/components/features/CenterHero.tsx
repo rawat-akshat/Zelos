@@ -3,7 +3,7 @@ export default function CenterHero() {
     <div
       style={{
         flexShrink: 0,
-        padding: "28px 20px 12px",
+        padding: "28px 20px 8px",
         textAlign: "center",
         position: "relative",
         zIndex: 1,
@@ -12,14 +12,26 @@ export default function CenterHero() {
       <h1
         className="font-heading"
         style={{
-          fontSize: "clamp(28px, 3.4vw, 38px)",
-          lineHeight: 1.1,
+          fontSize: "clamp(26px, 3.2vw, 36px)",
+          lineHeight: 1.15,
           color: "var(--text-primary)",
           letterSpacing: "-0.034em",
+          marginBottom: 10,
         }}
       >
-        What&apos;s keeping you stuck today?
+        What are you working through today?
       </h1>
+      <p
+        style={{
+          fontSize: 14,
+          lineHeight: 1.55,
+          color: "var(--text-secondary)",
+          maxWidth: 480,
+          margin: "0 auto",
+        }}
+      >
+        Talk it through. Zelos will help you understand the pattern and choose the next honest step.
+      </p>
     </div>
   );
 }

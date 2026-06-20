@@ -1,12 +1,26 @@
 "use client";
 
-import TodaysFocusCard from "./right-panel/TodaysFocusCard";
-import StreakCard from "./right-panel/StreakCard";
-import XPCard from "./right-panel/XPCard";
-import StatsRow from "./right-panel/StatsRow";
-import RecentWinsCard from "./right-panel/RecentWinsCard";
+import ActiveGoalCard from "./right-panel/ActiveGoalCard";
+import GoalTimelineCard from "./right-panel/GoalTimelineCard";
+import PatternsNoticedCard from "./right-panel/PatternsNoticedCard";
+import NextStepCard from "./right-panel/NextStepCard";
+import type { Goal, Pattern, TimelineEvent } from "../../lib/types";
 
-export default function RightPanel() {
+interface RightPanelProps {
+  activeGoal?: Goal | null;
+  patterns?: Pattern[];
+  timelineEvents?: TimelineEvent[];
+  isNewUser?: boolean;
+}
+
+export default function RightPanel({
+  activeGoal,
+  patterns,
+  timelineEvents,
+  isNewUser = false,
+}: RightPanelProps) {
+  const empty = isNewUser || !activeGoal;
+
   return (
     <aside
       className="hidden xl:flex"
@@ -25,11 +39,10 @@ export default function RightPanel() {
         padding: "40px 22px",
       }}
     >
-      <TodaysFocusCard />
-      <StreakCard />
-      <XPCard />
-      <StatsRow />
-      <RecentWinsCard />
+      <ActiveGoalCard goal={empty ? null : activeGoal} />
+      {!empty && <GoalTimelineCard events={timelineEvents} />}
+      <PatternsNoticedCard patterns={empty ? [] : patterns} empty={empty} />
+      <NextStepCard nextStep={empty ? null : activeGoal?.nextSuggestedAction} empty={empty} />
     </aside>
   );
 }

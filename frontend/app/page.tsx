@@ -5,12 +5,12 @@ import LandingNav from "./components/landing/LandingNav";
 import LandingFooter from "./components/landing/LandingFooter";
 import LandingBackground from "./components/landing/LandingBackground";
 import HeroSection from "./components/landing/HeroSection";
+import MoatSection from "./components/landing/MoatSection";
 import HowItWorksSection from "./components/landing/HowItWorksSection";
-import ProductPreviewSection from "./components/landing/ProductPreviewSection";
-import WhyTraditionalToolsSection from "./components/landing/WhyTraditionalToolsSection";
-import FeaturesSection from "./components/landing/FeaturesSection";
-import WhyZelosExistsSection from "./components/landing/WhyZelosExistsSection";
-import SocialProofSection from "./components/landing/SocialProofSection";
+import GoalTimelineSection from "./components/landing/GoalTimelineSection";
+import PlaybookSection from "./components/landing/PlaybookSection";
+import BehavioralInsightsSection from "./components/landing/BehavioralInsightsSection";
+import WhoItsForSection from "./components/landing/WhoItsForSection";
 import FAQSection from "./components/landing/FAQSection";
 import FinalCTASection from "./components/landing/FinalCTASection";
 
@@ -28,12 +28,12 @@ export default function LandingPage() {
 
       <main style={{ position: "relative", zIndex: 1 }}>
         <HeroSection />
+        <MoatSection />
         <HowItWorksSection />
-        <ProductPreviewSection />
-        <WhyTraditionalToolsSection />
-        <FeaturesSection />
-        <WhyZelosExistsSection />
-        <SocialProofSection />
+        <GoalTimelineSection />
+        <PlaybookSection />
+        <BehavioralInsightsSection />
+        <WhoItsForSection />
         <FAQSection />
         <FinalCTASection />
       </main>

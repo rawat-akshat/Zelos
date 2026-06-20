@@ -4,10 +4,10 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   async redirects() {
     return [
-      { source: "/history", destination: "/sessions", permanent: true },
-      { source: "/insights", destination: "/profile", permanent: true },
-      { source: "/streaks", destination: "/profile", permanent: true },
-      { source: "/achievements", destination: "/profile", permanent: true },
+      { source: "/sessions", destination: "/goals", permanent: true },
+      { source: "/history", destination: "/goals", permanent: true },
+      { source: "/streaks", destination: "/insights", permanent: true },
+      { source: "/achievements", destination: "/insights", permanent: true },
     ];
   },
 };

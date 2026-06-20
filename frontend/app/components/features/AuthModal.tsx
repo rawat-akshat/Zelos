@@ -108,7 +108,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                 marginBottom: 28,
               }}
             >
-              Build streaks, earn XP, and continue your journey across sessions.
+              Save your goals, track patterns over time, and continue your journey across conversations.
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>

@@ -33,7 +33,7 @@ export default function LandingFooter() {
               Zelos
             </span>
             <p className="landing-body-sm" style={{ margin: 0 }}>
-              Helping people move from intention to action.
+              A goal-native behavioral coach for meaningful progress.
             </p>
           </div>
 

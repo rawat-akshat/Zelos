@@ -4,11 +4,11 @@ import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react
 import { ArrowUp, Loader2, Paperclip, Mic } from "lucide-react";
 
 const PLACEHOLDERS = [
-  "What feels overwhelming right now?",
-  "What are you putting off today?",
-  "What task makes you freeze up?",
-  "Describe what you're stuck on...",
-  "What have you been avoiding?",
+  "Share what you're thinking about, avoiding, or trying to decide…",
+  "What's on your mind about this goal?",
+  "Describe the loop you're stuck in…",
+  "What feels uncertain right now?",
+  "What would progress look like today?",
 ];
 
 const MIN_ROWS = 2;
@@ -142,7 +142,7 @@ export default function TaskInput({
             maxHeight: MAX_TEXT_HEIGHT,
             opacity: loading ? 0.6 : 1,
           }}
-          aria-label="Describe what you're stuck on"
+          aria-label="Share what you're working through"
         />
       </div>
 

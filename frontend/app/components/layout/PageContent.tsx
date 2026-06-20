@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 interface PageContentProps {
   title: string;
   subtitle?: string;
+  action?: React.ReactNode;
   children: React.ReactNode;
   maxWidth?: number;
 }
@@ -12,6 +13,7 @@ interface PageContentProps {
 export default function PageContent({
   title,
   subtitle,
+  action,
   children,
   maxWidth = 600,
 }: PageContentProps) {
@@ -28,25 +30,38 @@ export default function PageContent({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.28 }}
-          style={{ textAlign: "center", marginBottom: 48 }}
+          style={{ textAlign: action ? "left" : "center", marginBottom: 48 }}
         >
-          <h1
-            className="font-heading"
+          <div
             style={{
-              fontSize: 36,
-              color: "var(--text-primary)",
-              marginBottom: subtitle ? 12 : 0,
-              letterSpacing: "-0.038em",
-              lineHeight: 1.08,
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: action ? "space-between" : "center",
+              gap: 16,
+              flexWrap: "wrap",
             }}
           >
-            {title}
-          </h1>
-          {subtitle && (
-            <p style={{ fontSize: 15, color: "var(--text-secondary)", lineHeight: 1.65 }}>
-              {subtitle}
-            </p>
-          )}
+            <div style={{ flex: 1, textAlign: action ? "left" : "center" }}>
+              <h1
+                className="font-heading"
+                style={{
+                  fontSize: 36,
+                  color: "var(--text-primary)",
+                  marginBottom: subtitle ? 12 : 0,
+                  letterSpacing: "-0.038em",
+                  lineHeight: 1.08,
+                }}
+              >
+                {title}
+              </h1>
+              {subtitle && (
+                <p style={{ fontSize: 15, color: "var(--text-secondary)", lineHeight: 1.65 }}>
+                  {subtitle}
+                </p>
+              )}
+            </div>
+            {action && <div style={{ flexShrink: 0 }}>{action}</div>}
+          </div>
         </motion.header>
 
         <motion.div

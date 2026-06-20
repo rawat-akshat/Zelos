@@ -6,70 +6,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import FadeUp from "./FadeUp";
 
 const answerStyle = { margin: "0 0 14px", paddingRight: 32 };
-const listStyle = {
-  margin: "0 0 14px",
-  paddingLeft: 20,
-  paddingRight: 32,
-  display: "flex",
-  flexDirection: "column" as const,
-  gap: 6,
-};
 
 const FAQS = [
   {
-    q: "How do I know if Zelos is for me?",
+    q: "What is Zelos?",
     answer: (
       <>
         <p className="landing-body" style={answerStyle}>
-          Zelos is for people who often find themselves stuck between intention and action.
-        </p>
-        <p className="landing-body" style={answerStyle}>
-          You might know exactly what needs to be done but still struggle to begin. Maybe you
-          procrastinate on important tasks, feel overwhelmed by large projects, overthink
-          decisions, or keep putting something off even though you genuinely want to do it.
-        </p>
-        <p className="landing-body" style={answerStyle}>
-          If you&apos;ve ever thought:
-        </p>
-        <ul className="landing-body" style={listStyle}>
-          <li>&ldquo;I&apos;ll start tomorrow.&rdquo;</li>
-          <li>&ldquo;I don&apos;t even know where to begin.&rdquo;</li>
-          <li>&ldquo;This feels overwhelming.&rdquo;</li>
-          <li>&ldquo;Why can&apos;t I just do it?&rdquo;</li>
-        </ul>
-        <p className="landing-body" style={answerStyle}>
-          then Zelos was built with you in mind.
+          Zelos is a goal-native AI behavioral coach. It remembers what you&apos;re trying to achieve over time,
+          notices recurring behavioral patterns, and helps you move from discussion to action.
         </p>
         <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
-          You don&apos;t need a diagnosis, a productivity system, or a perfectly organized life.
-          You just need something you&apos;d like to move forward on.
-        </p>
-      </>
-    ),
-  },
-  {
-    q: "What kinds of things can Zelos help with?",
-    answer: (
-      <>
-        <p className="landing-body" style={answerStyle}>
-          Almost anything that feels overwhelming, unclear, or mentally heavy.
-        </p>
-        <p className="landing-body" style={answerStyle}>
-          People use Zelos for things like:
-        </p>
-        <ul className="landing-body" style={listStyle}>
-          <li>Updating a resume</li>
-          <li>Studying for exams</li>
-          <li>Cleaning a room or apartment</li>
-          <li>Starting a side project</li>
-          <li>Writing an important email</li>
-          <li>Preparing for interviews</li>
-          <li>Organizing their week</li>
-          <li>Making difficult decisions</li>
-        </ul>
-        <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
-          Sometimes the challenge isn&apos;t the task itself—it&apos;s figuring out how to begin.
-          That&apos;s where Zelos helps.
+          It&apos;s not a task manager, planner, or generic chatbot — it&apos;s a long-term thinking partner
+          for meaningful goals.
         </p>
       </>
     ),
@@ -79,85 +28,53 @@ const FAQS = [
     answer: (
       <>
         <p className="landing-body" style={answerStyle}>
-          ChatGPT is a powerful general-purpose AI. Zelos is built specifically for moments when
-          you feel stuck.
-        </p>
-        <p className="landing-body" style={answerStyle}>
-          Instead of giving broad answers, Zelos focuses on understanding what&apos;s creating
-          resistance and helping you take a realistic next step.
-        </p>
-        <p className="landing-body" style={answerStyle}>
-          It combines practical action with psychological insight, so you&apos;re not just getting
-          advice—you&apos;re building momentum.
-        </p>
-        <p className="landing-body" style={answerStyle}>
-          Think of ChatGPT as a brilliant assistant.
+          ChatGPT responds to prompts. Zelos builds memory around your goals, tracks behavioral patterns across
+          conversations, and suggests experiments based on how you actually work.
         </p>
         <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
-          Think of Zelos as a guide for moments when your brain refuses to cooperate.
+          The difference is continuity — progress, patterns, and coaching that compounds over weeks and months.
         </p>
       </>
     ),
   },
   {
-    q: "Do I need to know exactly what's wrong?",
+    q: "What kinds of goals can I work on?",
     answer: (
       <>
         <p className="landing-body" style={answerStyle}>
-          Not at all.
-        </p>
-        <p className="landing-body" style={answerStyle}>
-          Many people come to Zelos because they don&apos;t know what&apos;s wrong.
-        </p>
-        <p className="landing-body" style={answerStyle}>
-          You can start with a messy thought, a vague feeling of overwhelm, or a task you&apos;ve
-          been avoiding for weeks.
-        </p>
-        <p className="landing-body" style={answerStyle}>
-          You don&apos;t need the perfect explanation.
+          Anything meaningful and long-term: launching a startup, switching careers, writing consistently,
+          finishing a degree, making a difficult life decision, or building a new habit.
         </p>
         <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
-          Just tell Zelos what&apos;s going on, and it will help you untangle it from there.
+          Zelos is built for goals that unfold over time — not one-off task lists.
         </p>
       </>
     ),
   },
   {
-    q: "Is Zelos safe and private?",
+    q: "What are behavioral patterns?",
     answer: (
       <>
         <p className="landing-body" style={answerStyle}>
-          Yes. Your conversations belong to you.
-        </p>
-        <p className="landing-body" style={answerStyle}>
-          Zelos is designed to help you think through challenges, not expose them.
-        </p>
-        <p className="landing-body" style={answerStyle}>
-          We only collect the information needed to provide and improve the service, and we&apos;re
-          committed to being transparent about how your data is handled.
+          Patterns are recurring behaviors Zelos notices — like research spirals, decision loops, avoidance,
+          topic drift, or action gaps.
         </p>
         <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
-          Trust is essential for a product like this, and protecting that trust will always be a
-          priority.
+          They appear as gentle observations with evidence, not diagnoses. The goal is understanding, not labeling.
         </p>
       </>
     ),
   },
   {
-    q: "Is Zelos appropriate for all ages?",
+    q: "Do I need to know what's blocking me?",
     answer: (
       <>
         <p className="landing-body" style={answerStyle}>
-        Zelos is designed for anyone who wants help overcoming overwhelm, procrastination, or difficulty getting started.
-        </p>
-        <p className="landing-body" style={answerStyle}>
-        Whether you're a student, professional, creator, founder, or simply trying to tackle everyday tasks, Zelos can help you break through mental friction and take the next step.
+          Not at all. You can start with a vague sense of being stuck, a goal you keep circling, or uncertainty
+          about what to do next.
         </p>
         <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
-        The experience is built around self-reflection, goal-setting, and taking action, making it most useful for people who want to better understand their challenges and make steady progress toward their goals.
-        </p>
-        <p className="landing-body" style={answerStyle}>
-        If you've ever known what you needed to do but struggled to begin, Zelos is for you.
+          Zelos helps you talk it through and surface patterns you might not see on your own.
         </p>
       </>
     ),
@@ -167,16 +84,25 @@ const FAQS = [
     answer: (
       <>
         <p className="landing-body" style={answerStyle}>
-          No.
-        </p>
-        <p className="landing-body" style={answerStyle}>
-          Zelos is a productivity and self-reflection tool, not a therapist, doctor, or mental
-          health service.
+          No. Zelos is a behavioral coaching tool for goal progress and self-understanding — not therapy,
+          medical advice, or crisis support.
         </p>
         <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
-          It can help you organize your thoughts, understand common blockers, and take practical next
-          steps, but it should not be used as a substitute for professional medical, psychological,
-          or crisis support.
+          If you need professional mental health support, please reach out to a qualified provider.
+        </p>
+      </>
+    ),
+  },
+  {
+    q: "Is Zelos private?",
+    answer: (
+      <>
+        <p className="landing-body" style={answerStyle}>
+          Your conversations and goals belong to you. We only collect what&apos;s needed to provide and improve
+          the service, and we&apos;re committed to being transparent about data handling.
+        </p>
+        <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
+          Trust is essential for honest coaching — protecting it is a priority.
         </p>
       </>
     ),
@@ -186,17 +112,11 @@ const FAQS = [
     answer: (
       <>
         <p className="landing-body" style={answerStyle}>
-          Yes.
-        </p>
-        <p className="landing-body" style={answerStyle}>
-          The current version of Zelos is free to use.
-        </p>
-        <p className="landing-body" style={answerStyle}>
-          As the product grows, premium features may be introduced, but the core mission remains the
-          same: helping people get unstuck and take meaningful action.
+          Yes — the current version is free to use while we focus on building something genuinely useful.
         </p>
         <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
-          Right now, the focus is simple—build something genuinely useful.
+          Premium features may be introduced later, but the core mission stays the same: meaningful progress on
+          meaningful goals.
         </p>
       </>
     ),
@@ -207,11 +127,7 @@ function FAQItem({ q, answer }: { q: string; answer: React.ReactNode }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div
-      style={{
-        borderBottom: "1px solid var(--landing-border)",
-      }}
-    >
+    <div style={{ borderBottom: "1px solid var(--landing-border)" }}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
@@ -266,7 +182,7 @@ export default function FAQSection() {
   return (
     <section
       style={{
-        padding: "80px clamp(24px, 5vw, 64px) 120px",
+        padding: "80px clamp(24px, 5vw, 64px) 80px",
         position: "relative",
         zIndex: 1,
       }}

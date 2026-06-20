@@ -1,10 +1,10 @@
 import type {
-  UserStats,
-  Session,
-  Achievement,
-  StreakDay,
-  TodaysFocus,
-  BlockerType,
+  Goal,
+  TimelineEvent,
+  Pattern,
+  Intervention,
+  InsightsData,
+  UserUsage,
 } from "./types";
 
 export const mockUser = {
@@ -14,239 +14,251 @@ export const mockUser = {
   plan: "Free" as const,
 };
 
-export const mockProfileAchievements = [
-  { id: "first-session", title: "First Session", unlocked: true },
-  { id: "streak-3", title: "3-Day Streak", unlocked: true },
-  { id: "streak-7", title: "7-Day Streak", unlocked: false },
-  { id: "sessions-10", title: "10 Sessions Completed", unlocked: false },
-  { id: "first-task", title: "First Task Completed", unlocked: true },
-];
-
-export const mockUserStats: UserStats = {
-  currentStreak: 7,
-  longestStreak: 12,
-  totalXP: 320,
-  xpToNextLevel: 500,
-  level: 4,
-  tasksCompleted: 18,
-  focusSessions: 6,
-  totalActionsCompleted: 47,
-  totalSessions: 6,
-};
-
-export const mockTodaysFocus: TodaysFocus = {
-  sessionId: "session-1",
-  title: "Resume Writing",
-  lastActive: new Date(Date.now() - 86400000),
-  nextAction: "Update project experience section",
-  estimatedMinutes: 5,
-  totalActions: 5,
-  completedActions: 3,
+export const mockUsage: UserUsage = {
+  goalsActive: 2,
+  messagesThisMonth: 47,
+  focusSessionsThisMonth: 3,
 };
 
 function daysAgo(n: number): Date {
   return new Date(Date.now() - n * 86400000);
 }
 
-export const mockSessions: Session[] = [
-  {
-    id: "session-1",
-    title: "Resume Writing",
-    blockerType: "perfectionism",
-    blockerLabel: "Perfectionism",
-    totalActions: 5,
-    completedActions: 3,
-    createdAt: daysAgo(1),
-    isCompleted: false,
-  },
-  {
-    id: "session-2",
-    title: "Understanding Procrastination",
-    totalActions: 0,
-    completedActions: 0,
-    createdAt: daysAgo(1),
-    isCompleted: true,
-  },
-  {
-    id: "session-3",
-    title: "Study Plan for Exams",
-    blockerType: "overwhelm",
-    blockerLabel: "Overwhelm",
-    totalActions: 4,
-    completedActions: 4,
-    createdAt: daysAgo(2),
-    isCompleted: true,
-  },
-  {
-    id: "session-4",
-    title: "Cleaning My Room",
-    blockerType: "avoidance",
-    blockerLabel: "Avoidance",
-    totalActions: 3,
-    completedActions: 3,
-    createdAt: daysAgo(2),
-    isCompleted: true,
-  },
-  {
-    id: "session-5",
-    title: "Side Project Planning",
-    blockerType: "ambiguity",
-    blockerLabel: "Ambiguity",
-    totalActions: 5,
-    completedActions: 2,
-    createdAt: daysAgo(7),
-    isCompleted: false,
-  },
-  {
-    id: "session-6",
-    title: "Sending a Difficult Email",
-    blockerType: "avoidance",
-    blockerLabel: "Avoidance",
-    totalActions: 3,
-    completedActions: 3,
-    createdAt: daysAgo(7),
-    isCompleted: true,
-  },
-];
-
-export const mockRecentWins = [
-  { label: "Study Plan Completed", xp: 25, daysAgo: 2 },
-  { label: "Sent Difficult Email", xp: 15, daysAgo: 7 },
-  { label: "Cleaned Room — 3 steps done", xp: 15, daysAgo: 7 },
-];
-
-export const mockAchievements: Achievement[] = [
-  {
-    id: "first-step",
-    title: "First Step",
-    description: "Complete your very first action",
-    icon: "footprints",
-    unlocked: true,
-    unlockedAt: daysAgo(14),
-    category: "actions",
-  },
-  {
-    id: "streak-starter",
-    title: "Streak Starter",
-    description: "Maintain a 3-day streak",
-    icon: "flame",
-    unlocked: true,
-    unlockedAt: daysAgo(5),
-    category: "streak",
-  },
-  {
-    id: "deep-thinker",
-    title: "Deep Thinker",
-    description: "Read 5 educational breakdowns",
-    icon: "book-open",
-    unlocked: true,
-    unlockedAt: daysAgo(3),
-    category: "explore",
-  },
-  {
-    id: "focus-session",
-    title: "Focus Starter",
-    description: "Complete your first Focus Session",
-    icon: "timer",
-    unlocked: true,
-    unlockedAt: daysAgo(2),
-    category: "focus",
-  },
-  {
-    id: "action-hero",
-    title: "Action Hero",
-    description: "Complete 50 actions in total",
-    icon: "zap",
-    unlocked: false,
-    category: "actions",
-  },
-  {
-    id: "focus-master",
-    title: "Focus Master",
-    description: "Complete 10 Focus Sessions",
-    icon: "target",
-    unlocked: false,
-    category: "focus",
-  },
-  {
-    id: "week-streak",
-    title: "Week Warrior",
-    description: "Reach a 7-day streak",
-    icon: "calendar-check",
-    unlocked: false,
-    category: "streak",
-  },
-  {
-    id: "perfectionism-slayer",
-    title: "Perfectionism Slayer",
-    description: "Break through perfectionism 5 times",
-    icon: "shield-check",
-    unlocked: false,
-    category: "actions",
-  },
-  {
-    id: "month-streak",
-    title: "Unstoppable",
-    description: "Reach a 30-day streak",
-    icon: "crown",
-    unlocked: false,
-    category: "streak",
-  },
-  {
-    id: "explorer",
-    title: "Explorer",
-    description: "Try all 5 blocker types",
-    icon: "compass",
-    unlocked: false,
-    category: "explore",
-  },
-  {
-    id: "speed-runner",
-    title: "Speed Runner",
-    description: "Complete a task in under 10 minutes",
-    icon: "rocket",
-    unlocked: false,
-    category: "focus",
-  },
-  {
-    id: "comeback",
-    title: "Comeback Kid",
-    description: "Return after a 3-day gap and complete a task",
-    icon: "refresh-cw",
-    unlocked: false,
-    category: "streak",
-  },
-];
-
-export function generateStreakDays(days = 35): StreakDay[] {
-  const result: StreakDay[] = [];
-  for (let i = days - 1; i >= 0; i--) {
-    const date = daysAgo(i);
-    const isRecent = i < 7;
-    const active = isRecent ? Math.random() > 0.15 : Math.random() > 0.45;
-    result.push({
-      date,
-      active,
-      actionsCompleted: active ? Math.floor(Math.random() * 6) + 1 : 0,
-    });
-  }
-  return result;
+function hoursAgo(n: number): Date {
+  return new Date(Date.now() - n * 3600000);
 }
 
-export const blockerColors: Record<BlockerType, string> = {
-  perfectionism: "rgba(198, 169, 105, 0.15)",
-  overwhelm: "rgba(139, 92, 246, 0.12)",
-  ambiguity: "rgba(59, 130, 246, 0.12)",
-  avoidance: "rgba(236, 72, 153, 0.1)",
-  fear: "rgba(239, 68, 68, 0.1)",
-  procrastination: "rgba(245, 158, 11, 0.1)",
+export const mockActiveGoal: Goal = {
+  id: "goal-1",
+  title: "Build Zelos MVP",
+  description: "Ship a goal-native behavioral coach, not another chatbot clone.",
+  currentState: "Deciding frontend UX",
+  lastAction: "Backend setup completed",
+  nextSuggestedAction: "Finalize workspace layout",
+  status: "active",
+  detectedPatternsCount: 3,
+  createdAt: daysAgo(14),
+  updatedAt: hoursAgo(2),
 };
 
-export const blockerTextColors: Record<BlockerType, string> = {
-  perfectionism: "#C6A969",
-  overwhelm: "#A78BFA",
-  ambiguity: "#93C5FD",
-  avoidance: "#F9A8D4",
-  fear: "#FCA5A5",
-  procrastination: "#FCD34D",
+export const mockGoals: Goal[] = [
+  mockActiveGoal,
+  {
+    id: "goal-2",
+    title: "Job Switch",
+    description: "Move to a product role with meaningful impact.",
+    currentState: "Resume and referrals",
+    lastAction: "Updated one resume bullet",
+    nextSuggestedAction: "Send 2 applications",
+    status: "active",
+    detectedPatternsCount: 2,
+    createdAt: daysAgo(30),
+    updatedAt: daysAgo(1),
+  },
+  {
+    id: "goal-3",
+    title: "Write Consistently",
+    description: "Publish one essay per week on learning and behavior.",
+    currentState: "Paused — low bandwidth",
+    lastAction: "Drafted outline for essay 3",
+    nextSuggestedAction: "Pick one topic and write 200 words",
+    status: "paused",
+    detectedPatternsCount: 1,
+    createdAt: daysAgo(45),
+    updatedAt: daysAgo(8),
+  },
+  {
+    id: "goal-4",
+    title: "Morning Fitness Habit",
+    description: "20 minutes of movement before work, 4× per week.",
+    currentState: "Completed 3-week experiment",
+    lastAction: "Reviewed what worked",
+    nextSuggestedAction: "Restart with 15-minute walks",
+    status: "completed",
+    detectedPatternsCount: 0,
+    createdAt: daysAgo(90),
+    updatedAt: daysAgo(21),
+  },
+];
+
+export const mockTimelineEvents: TimelineEvent[] = [
+  {
+    id: "tl-1",
+    goalId: "goal-1",
+    type: "action_completed",
+    title: "Backend setup completed",
+    createdAt: hoursAgo(5),
+  },
+  {
+    id: "tl-2",
+    goalId: "goal-1",
+    type: "blocker_identified",
+    title: "Frontend UX uncertainty surfaced",
+    description: "Comparing layout options without committing.",
+    createdAt: hoursAgo(3),
+  },
+  {
+    id: "tl-3",
+    goalId: "goal-1",
+    type: "pattern_detected",
+    title: "Research spiral risk detected",
+    confidence: 0.72,
+    createdAt: hoursAgo(2),
+  },
+  {
+    id: "tl-4",
+    goalId: "goal-1",
+    type: "decision_made",
+    title: "Decision made: use 3-panel layout",
+    createdAt: hoursAgo(1),
+  },
+  {
+    id: "tl-5",
+    goalId: "goal-1",
+    type: "action_committed",
+    title: "Next action set: build workspace shell",
+    createdAt: hoursAgo(0.5),
+  },
+  {
+    id: "tl-6",
+    goalId: "goal-1",
+    type: "goal_created",
+    title: "Goal created: Build Zelos MVP",
+    createdAt: daysAgo(14),
+  },
+];
+
+export const mockPatterns: Pattern[] = [
+  {
+    id: "pat-1",
+    goalId: "goal-1",
+    name: "Research Spiral",
+    description: "Reading and comparing instead of deciding.",
+    confidence: 0.72,
+    evidenceCount: 3,
+    lastDetectedAt: hoursAgo(2),
+  },
+  {
+    id: "pat-2",
+    goalId: "goal-1",
+    name: "Decision Loop",
+    description: "Weighing options to avoid committing to one next step.",
+    confidence: 0.61,
+    evidenceCount: 2,
+    lastDetectedAt: hoursAgo(3),
+  },
+  {
+    id: "pat-3",
+    goalId: "goal-1",
+    name: "Topic Drift",
+    description: "Moving from implementation to meta-discussion.",
+    confidence: 0.54,
+    evidenceCount: 1,
+    lastDetectedAt: daysAgo(1),
+  },
+];
+
+export const mockInlineIntervention: Intervention = {
+  id: "int-1",
+  goalId: "goal-1",
+  type: "inline",
+  patternName: "Research Spiral",
+  message:
+    "You may be entering a research spiral. You've compared several options, but no decision has been made yet.",
+  confidence: 0.74,
+  evidenceCount: 3,
+  actions: ["Show evidence", "Help me choose", "Dismiss"],
+};
+
+export const mockFloatingIntervention: Intervention = {
+  id: "int-2",
+  goalId: "goal-1",
+  type: "floating",
+  patternName: "Decision Loop",
+  message:
+    "You may be comparing options to avoid committing to one next step.",
+  confidence: 0.68,
+  evidenceCount: 2,
+  actions: ["Choose one now", "Continue exploring"],
+};
+
+export const mockInsights: InsightsData = {
+  strengths: ["Honest self-reflection", "Long-term thinking"],
+  growthAreas: ["Research spiral", "Decision loop", "Avoidance after uncertainty"],
+  recurringPatterns: mockPatterns,
+  playbook: {
+    worksWell: [
+      "Small deadlines",
+      "Imperfect first drafts",
+      "Choosing one next step",
+    ],
+    doesNotWork: [
+      "Endless research",
+      "Competitor comparison",
+      "Waiting for confidence",
+    ],
+    experiments: [
+      "Ship before optimizing",
+      "Apply before perfecting resume",
+      "One imperfect draft daily",
+    ],
+  },
+  timelineSummary:
+    "Over the past two weeks you've made steady progress on Zelos, with recurring loops around research and decision-making before committing to action.",
+};
+
+export function formatRelativeTime(date: Date): string {
+  const diffMs = Date.now() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 60) {
+    if (diffMins < 1) return "Just now";
+    return diffMins === 1 ? "1 min ago" : `${diffMins} mins ago`;
+  }
+  if (diffHours < 24) {
+    const label =
+      date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) ??
+      "Today";
+    return `Today, ${label}`;
+  }
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+export function formatLastActive(date: Date): string {
+  const diffDays = Math.floor((Date.now() - date.getTime()) / 86400000);
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  return `${diffDays} days ago`;
+}
+
+export const GOAL_HELPER_CHIPS = [
+  "Startup",
+  "Career",
+  "Learning",
+  "Fitness",
+  "Writing",
+  "Life decision",
+  "Not sure yet",
+];
+
+export const blockerColors: Record<string, string> = {
+  perfectionism: "#C9A85A",
+  overwhelm: "#A66B6B",
+  ambiguity: "#7B746A",
+  avoidance: "#8B7355",
+  fear: "#9A9388",
+  procrastination: "#B78C54",
+};
+
+export const blockerTextColors: Record<string, string> = {
+  perfectionism: "#8B6914",
+  overwhelm: "#7A4545",
+  ambiguity: "#5A534A",
+  avoidance: "#6B5435",
+  fear: "#6B6458",
+  procrastination: "#8B6914",
 };

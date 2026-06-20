@@ -1,3 +1,82 @@
+export type GoalStatus = "active" | "paused" | "completed";
+
+export type TimelineEventType =
+  | "goal_created"
+  | "blocker_identified"
+  | "pattern_detected"
+  | "topic_drift_detected"
+  | "decision_made"
+  | "action_committed"
+  | "action_completed"
+  | "experiment_started"
+  | "experiment_reviewed";
+
+export interface Goal {
+  id: string;
+  title: string;
+  description?: string;
+  currentState?: string;
+  lastAction?: string;
+  nextSuggestedAction?: string;
+  status: GoalStatus;
+  detectedPatternsCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface TimelineEvent {
+  id: string;
+  goalId: string;
+  type: TimelineEventType;
+  title: string;
+  description?: string;
+  confidence?: number;
+  createdAt: Date;
+}
+
+export interface Pattern {
+  id: string;
+  goalId?: string;
+  name: string;
+  description: string;
+  confidence: number;
+  evidenceCount: number;
+  lastDetectedAt: Date;
+}
+
+export interface Intervention {
+  id: string;
+  goalId: string;
+  type: "inline" | "floating";
+  patternName: string;
+  message: string;
+  confidence: number;
+  evidenceCount: number;
+  actions: string[];
+}
+
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  intervention?: Intervention;
+}
+
+export interface PersonalPlaybook {
+  worksWell: string[];
+  doesNotWork: string[];
+  experiments: string[];
+}
+
+export interface InsightsData {
+  strengths: string[];
+  growthAreas: string[];
+  recurringPatterns: Pattern[];
+  playbook: PersonalPlaybook;
+  timelineSummary: string;
+}
+
+/** @deprecated Use Goal — kept for legacy mock-ai compatibility */
 export type BlockerType =
   | "perfectionism"
   | "overwhelm"
@@ -14,7 +93,6 @@ export interface Action {
   estimatedMinutes: number;
   completed: boolean;
   completedAt?: Date;
-  /** Hidden sub-steps from backend — revealed once via Break It Down */
   subSteps?: string[];
 }
 
@@ -27,16 +105,10 @@ export interface TaskResponse {
   actions: Action[];
   suggestedQuestions?: string[];
   concept?: string;
-  /** Different strategy for Try Another Approach */
   alternative?: {
     explanation: string;
     actions: Action[];
   };
-}
-
-export interface LearnSection {
-  title: string;
-  content: string;
 }
 
 export interface LearnResponse {
@@ -56,6 +128,7 @@ export interface MixedResponse {
 
 export type AIResponse = TaskResponse | LearnResponse | MixedResponse;
 
+/** @deprecated Use Goal */
 export interface Session {
   id: string;
   title: string;
@@ -67,47 +140,8 @@ export interface Session {
   isCompleted: boolean;
 }
 
-export interface UserStats {
-  currentStreak: number;
-  longestStreak: number;
-  totalXP: number;
-  xpToNextLevel: number;
-  level: number;
-  tasksCompleted: number;
-  focusSessions: number;
-  totalActionsCompleted: number;
-  totalSessions: number;
-}
-
-export interface Achievement {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  unlocked: boolean;
-  unlockedAt?: Date;
-  category: "streak" | "actions" | "focus" | "explore";
-}
-
-export interface StreakDay {
-  date: Date;
-  active: boolean;
-  actionsCompleted: number;
-}
-
-export type NavItem = {
-  id: string;
-  label: string;
-  href: string;
-  icon: string;
-};
-
-export interface TodaysFocus {
-  sessionId: string;
-  title: string;
-  lastActive: Date;
-  nextAction: string;
-  estimatedMinutes: number;
-  totalActions: number;
-  completedActions: number;
+export interface UserUsage {
+  goalsActive: number;
+  messagesThisMonth: number;
+  focusSessionsThisMonth: number;
 }

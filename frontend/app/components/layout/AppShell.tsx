@@ -2,26 +2,43 @@
 
 import Sidebar from "./Sidebar";
 import RightPanel from "./RightPanel";
+import NewGoalModal from "../features/NewGoalModal";
 import { Menu } from "lucide-react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { NAV_ITEMS, NAV_PAGE_TITLES } from "./nav-config";
 import NavItem from "./NavItem";
 import LandingBackground from "../landing/LandingBackground";
+import { WorkspaceProvider, useWorkspace } from "../../context/WorkspaceContext";
 
 interface AppShellProps {
   children: React.ReactNode;
 }
 
-export default function AppShell({ children }: AppShellProps) {
+function AppShellInner({ children }: AppShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const {
+    activeGoal,
+    patterns,
+    timelineEvents,
+    isNewUser,
+    newGoalModalOpen,
+    closeNewGoalModal,
+    startNewGoal,
+  } = useWorkspace();
 
   const pageTitle = NAV_PAGE_TITLES[pathname] ?? "Zelos";
   const isWorkspace = pathname === "/dashboard";
 
   return (
     <div className="flex min-h-screen" style={{ background: "var(--bg-base)" }}>
+      <NewGoalModal
+        open={newGoalModalOpen}
+        onClose={closeNewGoalModal}
+        onCreate={startNewGoal}
+      />
+
       <Sidebar />
 
       <header
@@ -102,7 +119,22 @@ export default function AppShell({ children }: AppShellProps) {
         <div style={{ position: "relative", zIndex: 1 }}>{children}</div>
       </main>
 
-      {isWorkspace && <RightPanel />}
+      {isWorkspace && (
+        <RightPanel
+          activeGoal={activeGoal}
+          patterns={patterns}
+          timelineEvents={timelineEvents}
+          isNewUser={isNewUser}
+        />
+      )}
     </div>
+  );
+}
+
+export default function AppShell({ children }: AppShellProps) {
+  return (
+    <WorkspaceProvider>
+      <AppShellInner>{children}</AppShellInner>
+    </WorkspaceProvider>
   );
 }

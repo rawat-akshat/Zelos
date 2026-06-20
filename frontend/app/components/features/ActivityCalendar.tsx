@@ -1,6 +1,10 @@
 "use client";
 
-import type { StreakDay } from "@/app/lib/types";
+interface StreakDay {
+  date: Date;
+  active: boolean;
+  actionsCompleted: number;
+}
 
 const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 const CELL = 11;

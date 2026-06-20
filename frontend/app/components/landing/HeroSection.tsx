@@ -1,134 +1,160 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { Paperclip, Mic, ArrowUp } from "lucide-react";
-import { saveInitialPrompt } from "../../lib/initial-prompt";
+import FadeUp from "./FadeUp";
+
+function HeroConversationVisual() {
+  return (
+    <div
+      style={{
+        background: "var(--landing-card)",
+        border: "1px solid var(--landing-border)",
+        borderRadius: 24,
+        padding: "28px 24px",
+        boxShadow: "var(--landing-shadow)",
+        textAlign: "left",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
+        <div
+          style={{
+            maxWidth: "88%",
+            padding: "12px 16px",
+            borderRadius: "16px 16px 4px 16px",
+            background: "rgba(201, 167, 92, 0.12)",
+            border: "1px solid rgba(201, 167, 92, 0.28)",
+            fontSize: 14,
+            lineHeight: 1.5,
+            color: "var(--landing-text)",
+          }}
+        >
+          I&apos;m still researching startup ideas.
+        </div>
+      </div>
+
+      <div
+        style={{
+          padding: "16px 18px",
+          borderRadius: "16px 16px 16px 4px",
+          background: "var(--landing-card-surface)",
+          border: "1px solid var(--landing-border)",
+          marginBottom: 14,
+        }}
+      >
+        <p className="landing-body" style={{ margin: "0 0 10px", color: "var(--landing-text)" }}>
+          You&apos;ve explored startup ideas across 5 conversations.
+        </p>
+        <p className="landing-body" style={{ margin: "0 0 10px", color: "var(--landing-text)" }}>
+          Possible pattern detected: <strong style={{ fontWeight: 600 }}>Research Spiral</strong>
+        </p>
+        <p className="landing-body" style={{ margin: 0, color: "var(--landing-text-secondary)" }}>
+          Would it help to explore what&apos;s making commitment feel risky?
+        </p>
+      </div>
+
+      <div
+        style={{
+          padding: "14px 16px",
+          borderRadius: 14,
+          border: "1px solid rgba(201, 167, 92, 0.4)",
+          background: "rgba(201, 167, 92, 0.08)",
+        }}
+      >
+        <p
+          style={{
+            margin: "0 0 6px",
+            fontSize: 10,
+            fontWeight: 600,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            color: "#9A7B3C",
+          }}
+        >
+          Pattern
+        </p>
+        <p className="font-landing-heading landing-card-title" style={{ margin: "0 0 8px" }}>
+          Research Spiral
+        </p>
+        <p className="landing-caption" style={{ margin: 0 }}>
+          Confidence: 82%
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export default function HeroSection() {
-  const router = useRouter();
-  const [prompt, setPrompt] = useState("");
-
-  const canSubmit = prompt.trim().length > 0;
-
-  const submitPrompt = useCallback(() => {
-    if (!prompt.trim()) return;
-    saveInitialPrompt(prompt);
-    router.push("/try");
-  }, [prompt, router]);
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      if (canSubmit) submitPrompt();
-    }
-  }
-
   return (
     <section
       style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        padding: "140px clamp(24px, 5vw, 64px) 64px",
-        textAlign: "center",
+        padding: "120px clamp(24px, 5vw, 64px) 80px",
         position: "relative",
         zIndex: 1,
       }}
     >
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, ease: [0.25, 0.1, 0.25, 1] }}
-        style={{ width: "100%", maxWidth: 680 }}
+      <div
+        style={{
+          maxWidth: 1180,
+          margin: "0 auto",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: "clamp(40px, 5vw, 72px)",
+          alignItems: "center",
+        }}
       >
-        <h1 className="font-landing-heading landing-display" style={{ marginBottom: 24 }}>
-          What&apos;s keeping you stuck today?
-        </h1>
-
-        <p className="landing-subhead" style={{ maxWidth: 600, margin: "0 auto 48px" }}>
-          Talk it through, understand the blocker, and take the next step.
-        </p>
-
-        <div
-          style={{
-            textAlign: "left",
-            background: "var(--landing-card)",
-            border: "3px solid #B8A898",
-            borderRadius: 24,
-            padding: "20px 26px 42px",
-            boxShadow: "var(--landing-shadow)",
-            marginBottom: 24,
-            position: "relative",
-          }}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          <textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="I've been avoiding updating my resume for weeks..."
-            rows={2}
-            className="landing-body"
-            style={{
-              width: "100%",
-              margin: 0,
-              padding: 0,
-              border: "none",
-              outline: "none",
-              resize: "none",
-              background: "transparent",
-              color: "var(--landing-text)",
-              fontFamily: "inherit",
-              fontSize: "inherit",
-              lineHeight: "inherit",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              bottom: 14,
-              left: 16,
-              right: 16,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Paperclip size={16} style={{ color: "var(--landing-text-muted)" }} />
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <Mic size={16} style={{ color: "var(--landing-text-muted)" }} />
-              <button
-                type="button"
-                onClick={submitPrompt}
-                disabled={!canSubmit}
-                aria-label="Submit prompt"
-                className={canSubmit ? "landing-btn-primary" : undefined}
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  background: canSubmit ? "#C9A75C" : "var(--landing-border)",
-                  color: "#1E1E1E",
-                  border: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: canSubmit ? "pointer" : "default",
-                  opacity: canSubmit ? 1 : 0.7,
-                }}
-              >
-                <ArrowUp size={14} style={{ color: canSubmit ? "#1E1E1E" : "var(--landing-text-muted)" }} />
-              </button>
-            </div>
-          </div>
-        </div>
+          <h1 className="font-landing-heading landing-display" style={{ marginBottom: 24, textAlign: "left" }}>
+            Stop having the same conversation with yourself.
+          </h1>
 
-        <p className="landing-caption" style={{ margin: 0 }}>
-          No productivity hacks. Just self-awareness and momentum.
-        </p>
-      </motion.div>
+          <p className="landing-subhead" style={{ marginBottom: 36, textAlign: "left", maxWidth: 520 }}>
+            Zelos remembers your goals, notices recurring behavioral patterns, and helps you move from endless thinking to meaningful action.
+          </p>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+            <Link
+              href="/dashboard?newGoal=1"
+              className="landing-btn-primary"
+              style={{
+                fontSize: 15,
+                fontWeight: 600,
+                padding: "14px 28px",
+                borderRadius: 12,
+                background: "#C9A75C",
+                color: "#1E1E1E",
+                textDecoration: "none",
+              }}
+            >
+              Start a Goal
+            </Link>
+            <a
+              href="#how-it-works"
+              className="landing-btn-secondary"
+              style={{
+                fontSize: 15,
+                fontWeight: 500,
+                padding: "14px 28px",
+                borderRadius: 12,
+                background: "transparent",
+                border: "1px solid var(--landing-border)",
+                color: "var(--landing-text-secondary)",
+                textDecoration: "none",
+              }}
+            >
+              See How It Works
+            </a>
+          </div>
+        </motion.div>
+
+        <FadeUp delay={0.12}>
+          <HeroConversationVisual />
+        </FadeUp>
+      </div>
     </section>
   );
 }

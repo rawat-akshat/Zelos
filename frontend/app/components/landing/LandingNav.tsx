@@ -59,7 +59,7 @@ export default function LandingNav({ blurred = false, showCta = true }: LandingN
         </Link>
         {showCta && (
         <Link
-          href="/try"
+          href="/dashboard?newGoal=1"
           className="landing-btn-primary"
           style={{
             fontSize: 14,
@@ -71,7 +71,7 @@ export default function LandingNav({ blurred = false, showCta = true }: LandingN
             textDecoration: "none",
           }}
         >
-          Try Zelos
+          Start a Goal
         </Link>
         )}
       </div>
