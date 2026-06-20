@@ -5,8 +5,8 @@ Maps to Supabase Postgres tables created in:
   supabase/migrations/20260317120000_phase1_v3_schema.sql
 """
 
-from pydantic import BaseModel, Field
-from typing import Optional, List, Any, Literal
+from pydantic import BaseModel, ConfigDict, Field
+from typing import Optional, List, Literal
 from datetime import datetime
 from uuid import UUID
 
@@ -60,6 +60,8 @@ class SuggestedExperiment(BaseModel):
 # ---------------------------------------------------------------------------
 
 class UserResponseV3(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
     id: UUID
     email: str
     name: Optional[str] = None
@@ -69,6 +71,17 @@ class UserResponseV3(BaseModel):
     auth_provider: Optional[str] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
+
+
+class ExchangeTokenRequest(BaseModel):
+    supabase_token: str = Field(..., min_length=10)
+
+
+class ExchangeTokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user_id: UUID
+    user: UserResponseV3
 
 
 # ---------------------------------------------------------------------------

@@ -9,7 +9,8 @@ pydantic-settings==2.2.1
 email-validator==2.1.1
 
 # Database
-supabase==2.4.4
+supabase>=2.31.0
+websockets>=13.0
 
 # AI
 openai==1.25.0

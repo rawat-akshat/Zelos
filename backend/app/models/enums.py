@@ -5,15 +5,15 @@ Keep in sync with Postgres CHECK constraints in:
   supabase/migrations/20260317120000_phase1_v3_schema.sql
 """
 
-from enum import StrEnum
+from enum import Enum
 
 
-class SubscriptionPlan(StrEnum):
+class SubscriptionPlan(str, Enum):
     FREE = "free"
     PREMIUM = "premium"
 
 
-class SessionStatus(StrEnum):
+class SessionStatus(str, Enum):
     ACTIVE = "active"
     PAUSED = "paused"
     COMPLETED = "completed"
@@ -21,7 +21,7 @@ class SessionStatus(StrEnum):
     ARCHIVED = "archived"  # legacy soft-delete value
 
 
-class TaskStatus(StrEnum):
+class TaskStatus(str, Enum):
     NOT_STARTED = "not_started"
     IN_PROGRESS = "in_progress"
     BLOCKED = "blocked"
@@ -30,13 +30,13 @@ class TaskStatus(StrEnum):
     CHANGED = "changed"
 
 
-class MessageRole(StrEnum):
+class MessageRole(str, Enum):
     USER = "user"
     ASSISTANT = "assistant"
     SYSTEM = "system"
 
 
-class CoachMode(StrEnum):
+class CoachMode(str, Enum):
     """V3 modes (legacy task/learn/mixed still accepted in DB)."""
     DO = "do"
     UNDERSTAND = "understand"
@@ -46,13 +46,13 @@ class CoachMode(StrEnum):
     MIXED = "mixed"
 
 
-class PatternSeverity(StrEnum):
+class PatternSeverity(str, Enum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
 
 
-class InterventionType(StrEnum):
+class InterventionType(str, Enum):
     GENTLE_REDIRECT = "gentle_redirect"
     VALIDATE_THEN_REFOCUS = "validate_then_refocus"
     BREAK_INTO_MICRO_STEP = "break_into_micro_step"
@@ -61,20 +61,20 @@ class InterventionType(StrEnum):
     CONTINUE_NORMALLY = "continue_normally"
 
 
-class FocusSessionStatus(StrEnum):
+class FocusSessionStatus(str, Enum):
     STARTED = "started"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
 
 
-class CandidatePatternStatus(StrEnum):
+class CandidatePatternStatus(str, Enum):
     CANDIDATE = "candidate"
     REVIEWED = "reviewed"
     PROMOTED = "promoted"
     REJECTED = "rejected"
 
 
-class V1PatternId(StrEnum):
+class V1PatternId(str, Enum):
     """Fixed V1 pattern catalog — seeded in pattern_definitions."""
     TOPIC_DRIFT = "topic_drift"
     RESEARCH_SPIRAL = "research_spiral"
