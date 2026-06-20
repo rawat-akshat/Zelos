@@ -39,7 +39,7 @@ export default function FinalCTASection() {
               Start Your First Goal
             </Link>
             <Link
-              href="/try"
+              href="/demo"
               className="landing-btn-secondary"
               style={{
                 display: "inline-block",

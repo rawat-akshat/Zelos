@@ -17,8 +17,7 @@ const FAQS = [
           notices recurring behavioral patterns, and helps you move from discussion to action.
         </p>
         <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
-          It&apos;s not a task manager, planner, or generic chatbot — it&apos;s a long-term thinking partner
-          for meaningful goals.
+          It&apos;s built for long-term goals — not quick answers or generic chat.
         </p>
       </>
     ),
@@ -28,11 +27,11 @@ const FAQS = [
     answer: (
       <>
         <p className="landing-body" style={answerStyle}>
-          ChatGPT responds to prompts. Zelos builds memory around your goals, tracks behavioral patterns across
-          conversations, and suggests experiments based on how you actually work.
+          ChatGPT responds to individual prompts. Zelos builds goal memory across conversations, tracks
+          behavioral patterns over time, and suggests experiments based on how you actually work.
         </p>
         <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
-          The difference is continuity — progress, patterns, and coaching that compounds over weeks and months.
+          The difference is continuity — coaching, progress, and patterns that compound across weeks and months.
         </p>
       </>
     ),
@@ -43,10 +42,10 @@ const FAQS = [
       <>
         <p className="landing-body" style={answerStyle}>
           Anything meaningful and long-term: launching a startup, switching careers, writing consistently,
-          finishing a degree, making a difficult life decision, or building a new habit.
+          making a difficult decision, returning to school, or building a new habit.
         </p>
         <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
-          Zelos is built for goals that unfold over time — not one-off task lists.
+          If it unfolds over weeks or months and matters to you, it belongs in Zelos.
         </p>
       </>
     ),
@@ -60,7 +59,8 @@ const FAQS = [
           topic drift, or action gaps.
         </p>
         <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
-          They appear as gentle observations with evidence, not diagnoses. The goal is understanding, not labeling.
+          They appear as gentle observations with evidence, not diagnoses. The goal is understanding your
+          behavior, not labeling you.
         </p>
       </>
     ),
@@ -70,8 +70,8 @@ const FAQS = [
     answer: (
       <>
         <p className="landing-body" style={answerStyle}>
-          Not at all. You can start with a vague sense of being stuck, a goal you keep circling, or uncertainty
-          about what to do next.
+          No. You can start with uncertainty — a goal you keep circling, a decision you keep postponing, or
+          a sense that something isn&apos;t moving forward.
         </p>
         <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
           Zelos helps you talk it through and surface patterns you might not see on your own.
@@ -80,29 +80,30 @@ const FAQS = [
     ),
   },
   {
-    q: "Is Zelos a replacement for professional help?",
+    q: "How does Zelos learn over time?",
     answer: (
       <>
         <p className="landing-body" style={answerStyle}>
-          No. Zelos is a behavioral coaching tool for goal progress and self-understanding — not therapy,
-          medical advice, or crisis support.
+          As you work through goals, Zelos remembers your context, tracks pattern occurrences, and updates
+          a personal playbook of what works and what doesn&apos;t for you.
         </p>
         <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
-          If you need professional mental health support, please reach out to a qualified provider.
+          Your timeline, patterns, and coaching become more personalized the more honestly you engage with
+          your goals.
         </p>
       </>
     ),
   },
   {
-    q: "Is Zelos private?",
+    q: "Is my data private?",
     answer: (
       <>
         <p className="landing-body" style={answerStyle}>
           Your conversations and goals belong to you. We only collect what&apos;s needed to provide and improve
-          the service, and we&apos;re committed to being transparent about data handling.
+          the service, and we&apos;re committed to being transparent about how your data is handled.
         </p>
         <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
-          Trust is essential for honest coaching — protecting it is a priority.
+          Honest coaching requires trust — protecting your privacy is part of that.
         </p>
       </>
     ),
@@ -117,6 +118,20 @@ const FAQS = [
         <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
           Premium features may be introduced later, but the core mission stays the same: meaningful progress on
           meaningful goals.
+        </p>
+      </>
+    ),
+  },
+  {
+    q: "Can Zelos replace therapy?",
+    answer: (
+      <>
+        <p className="landing-body" style={answerStyle}>
+          No. Zelos is a behavioral coaching tool for goal progress and self-understanding — not therapy,
+          medical advice, or crisis support.
+        </p>
+        <p className="landing-body" style={{ ...answerStyle, marginBottom: 22 }}>
+          If you need professional mental health support, please reach out to a qualified provider.
         </p>
       </>
     ),

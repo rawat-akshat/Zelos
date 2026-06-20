@@ -3,8 +3,20 @@
 import { Check, X } from "lucide-react";
 import FadeUp from "./FadeUp";
 
-const WORKS = ["Small deadlines", "Accountability", "Imperfect first drafts"];
-const DOESNT = ["Endless research", "Comparing alternatives", "Waiting for confidence"];
+const WORKS = [
+  "Breaking big decisions into one next step",
+  "Committing before you feel completely ready",
+  "Small deadlines that create momentum",
+  "Talking through uncertainty before acting",
+  "Focusing on actions instead of outcomes",
+];
+const DOESNT = [
+  "Researching for weeks without testing anything",
+  "Comparing every option before choosing one",
+  "Waiting until you feel confident enough",
+  "Restarting plans instead of continuing them",
+  "Avoiding uncomfortable conversations or decisions",
+];
 
 export default function PlaybookSection() {
   return (
@@ -20,7 +32,7 @@ export default function PlaybookSection() {
           <h2 className="font-landing-heading landing-section-title" style={{ marginBottom: 16 }}>
             Over time, Zelos learns what works for you.
           </h2>
-          <p className="landing-subhead" style={{ marginBottom: 48, maxWidth: 480, marginInline: "auto" }}>
+          <p className="landing-subhead" style={{ marginBottom: 48, maxWidth: 520, marginInline: "auto" }}>
             The more you use Zelos, the more personalized its coaching becomes.
           </p>
         </FadeUp>
@@ -32,11 +44,15 @@ export default function PlaybookSection() {
               gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
               gap: 20,
               textAlign: "left",
+              marginBottom: 32,
             }}
           >
             <PlaybookCard title="Works For You" items={WORKS} positive />
             <PlaybookCard title="Doesn't Work" items={DOESNT} />
           </div>
+          <p className="landing-body" style={{ margin: 0, maxWidth: 520, marginInline: "auto" }}>
+            Over time, Zelos builds a personal coaching playbook based on your conversations, behavior, and progress.
+          </p>
         </FadeUp>
       </div>
     </section>

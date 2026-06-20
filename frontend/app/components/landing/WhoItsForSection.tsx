@@ -8,7 +8,9 @@ const AUDIENCES = [
   "Students",
   "Creators",
   "Professionals",
-  "People Working Through Difficult Decisions",
+  "Parents",
+  "Lifelong Learners",
+  "Decision Makers",
 ];
 
 export default function WhoItsForSection() {
@@ -30,16 +32,17 @@ export default function WhoItsForSection() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gridTemplateColumns: "repeat(4, 1fr)",
             gap: 14,
           }}
+          className="audience-grid"
         >
           {AUDIENCES.map((label, i) => (
             <FadeUp key={label} delay={i * 0.04}>
               <div
                 className="landing-card"
                 style={{
-                  padding: "20px 18px",
+                  padding: "20px 16px",
                   background: "var(--landing-card)",
                   border: "1px solid var(--landing-border)",
                   borderRadius: 16,
@@ -47,6 +50,12 @@ export default function WhoItsForSection() {
                   fontWeight: 500,
                   color: "var(--landing-text)",
                   fontFamily: "var(--font-body)",
+                  minHeight: 72,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textAlign: "center",
+                  lineHeight: 1.35,
                 }}
               >
                 {label}
@@ -54,6 +63,14 @@ export default function WhoItsForSection() {
             </FadeUp>
           ))}
         </div>
+
+        <style>{`
+          @media (max-width: 768px) {
+            .audience-grid {
+              grid-template-columns: repeat(2, 1fr) !important;
+            }
+          }
+        `}</style>
       </div>
     </section>
   );
