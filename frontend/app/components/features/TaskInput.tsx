@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import { ArrowUp, Loader2, Paperclip, Mic } from "lucide-react";
+import { useSpeechRecognition } from "../../hooks/useSpeechRecognition";
 
 const PLACEHOLDERS = [
   "Share what you're thinking about, avoiding, or trying to decide…",
@@ -60,7 +61,12 @@ export default function TaskInput({
   };
   const [focused, setFocused] = useState(false);
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const { supported: voiceSupported, listening, toggle: toggleVoice } = useSpeechRecognition({
+    onError: (message: string) => setVoiceError(message),
+  });
 
   const minTextHeight = prominent ? LINE_HEIGHT * 3 : MIN_TEXT_HEIGHT;
   const maxTextHeight = prominent ? LINE_HEIGHT * 6 : MAX_TEXT_HEIGHT;
@@ -103,6 +109,11 @@ export default function TaskInput({
       e.preventDefault();
       handleSubmit();
     }
+  }
+
+  function handleVoiceInput() {
+    setVoiceError(null);
+    toggleVoice(value, setValue);
   }
 
   const canSubmit = value.trim().length >= 5 && !loading;
@@ -201,10 +212,25 @@ export default function TaskInput({
             </span>
           )}
 
+          {voiceError && (
+            <span style={{ fontSize: 11, color: "var(--error)", marginRight: 2 }}>
+              {voiceError}
+            </span>
+          )}
+
           <button
             type="button"
-            title="Voice input"
-            aria-label="Voice input"
+            onClick={handleVoiceInput}
+            disabled={loading || !voiceSupported}
+            title={
+              !voiceSupported
+                ? "Voice input not supported in this browser"
+                : listening
+                  ? "Stop listening"
+                  : "Voice input"
+            }
+            aria-label={listening ? "Stop voice input" : "Start voice input"}
+            aria-pressed={listening}
             style={{
               display: "flex",
               alignItems: "center",
@@ -212,16 +238,23 @@ export default function TaskInput({
               width: 32,
               height: 32,
               borderRadius: 8,
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              color: "var(--text-muted)",
-              transition: "color 200ms var(--ease)",
+              background: listening ? "var(--accent-glow)" : "transparent",
+              border: listening ? "1px solid var(--border-accent)" : "none",
+              cursor: loading || !voiceSupported ? "not-allowed" : "pointer",
+              color: listening ? "var(--accent)" : "var(--text-muted)",
+              opacity: !voiceSupported ? 0.45 : 1,
+              transition: "color 200ms var(--ease), background 200ms var(--ease), border-color 200ms var(--ease)",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
+            onMouseEnter={(e) => {
+              if (!loading && voiceSupported && !listening) {
+                e.currentTarget.style.color = "var(--text-secondary)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!listening) e.currentTarget.style.color = "var(--text-muted)";
+            }}
           >
-            <Mic size={15} strokeWidth={1.5} />
+            <Mic size={15} strokeWidth={listening ? 2 : 1.5} />
           </button>
 
           <button
