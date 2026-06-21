@@ -1,10 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from uuid import UUID
-import openai
 import json
 
 from app.core.database import Database
-from app.core.config import settings
+from app.llm.client import llm_client
 from app.models.schemas import (
     BreakdownRequest,
     BreakdownResponse,
@@ -14,9 +13,6 @@ from app.api.v1.endpoints.auth import get_current_user
 
 router = APIRouter()
 db = Database()
-
-# Configure OpenAI
-openai.api_key = settings.OPENAI_API_KEY
 
 
 BREAKDOWN_SYSTEM_PROMPT = """You are Zelos, an AI assistant that helps people overcome psychological blockers when starting tasks.
@@ -44,6 +40,20 @@ Return JSON:
 }"""
 
 
+def _generate_breakdown(task: str) -> dict:
+    ai_content = llm_client.complete(
+        system_prompt=BREAKDOWN_SYSTEM_PROMPT,
+        user_message=task,
+        temperature=0.7,
+        max_tokens=800,
+        json_mode=True,
+    )
+    ai_data = json.loads(ai_content)
+    if not all(k in ai_data for k in ["blocker_type", "validation_message", "actions"]):
+        raise ValueError("AI response missing required fields")
+    return ai_data
+
+
 @router.post("/", response_model=BreakdownResponse)
 async def create_breakdown(
     breakdown_data: BreakdownRequest,
@@ -51,59 +61,39 @@ async def create_breakdown(
 ):
     """
     Analyze a task and generate AI breakdown with micro-actions.
-    
+
     - **task**: The user's task description
     - **mode**: Optional mode hint (task/learn/mixed)
-    
+
     This endpoint:
-    1. Calls OpenAI GPT-4 to analyze the task
+    1. Calls the configured LLM to analyze the task
     2. Creates a new session
     3. Creates actions from AI response
     4. Returns the full breakdown
     """
     try:
-        # Call OpenAI API
-        response = openai.ChatCompletion.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": BREAKDOWN_SYSTEM_PROMPT},
-                {"role": "user", "content": breakdown_data.task}
-            ],
-            temperature=0.7,
-            max_tokens=800,
-            response_format={"type": "json_object"}
-        )
-        
-        # Parse AI response
-        ai_content = response.choices[0].message.content
-        ai_data = json.loads(ai_content)
-        
-        # Validate required fields
-        if not all(k in ai_data for k in ["blocker_type", "validation_message", "actions"]):
-            raise ValueError("AI response missing required fields")
-        
-        # Create session
+        ai_data = _generate_breakdown(breakdown_data.task)
+
         session_result = db.client.table("sessions").insert({
             "user_id": str(user_id),
             "first_message": breakdown_data.task,
             "blocker_type": ai_data["blocker_type"],
             "validation_message": ai_data["validation_message"],
-            "ai_model": "gpt-4o-mini",
+            "ai_model": llm_client.model,
             "status": "active",
             "total_actions": len(ai_data["actions"]),
             "completed_actions": 0
         }).execute()
-        
+
         if not session_result.data:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to create session"
             )
-        
+
         session = session_result.data[0]
         session_id = session["id"]
-        
-        # Create actions
+
         actions_to_insert = [
             {
                 "session_id": session_id,
@@ -114,16 +104,15 @@ async def create_breakdown(
             }
             for action in ai_data["actions"]
         ]
-        
+
         actions_result = db.client.table("actions").insert(actions_to_insert).execute()
-        
+
         if not actions_result.data:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to create actions"
             )
-        
-        # Format response
+
         action_responses = [
             ActionResponse(
                 id=a["id"],
@@ -137,7 +126,7 @@ async def create_breakdown(
             )
             for a in actions_result.data
         ]
-        
+
         return BreakdownResponse(
             session_id=session_id,
             blocker_type=ai_data["blocker_type"],
@@ -145,17 +134,19 @@ async def create_breakdown(
             actions=action_responses,
             suggested_questions=ai_data.get("suggested_questions")
         )
-        
-    except openai.error.OpenAIError as e:
+
+    except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"OpenAI API error: {str(e)}"
+            detail=str(e),
         )
     except json.JSONDecodeError:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to parse AI response"
         )
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -170,47 +161,30 @@ async def regenerate_breakdown(
 ):
     """
     Regenerate the AI breakdown for an existing session.
-    
+
     Deletes old actions and creates new ones based on fresh AI analysis.
     """
     try:
-        # Get session
         session_result = db.client.table("sessions")\
             .select("*")\
             .eq("id", str(session_id))\
             .eq("user_id", str(user_id))\
             .execute()
-        
+
         if not session_result.data:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Session not found"
             )
-        
+
         session = session_result.data[0]
-        
-        # Call OpenAI API with original task
-        response = openai.ChatCompletion.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": BREAKDOWN_SYSTEM_PROMPT},
-                {"role": "user", "content": session["first_message"]}
-            ],
-            temperature=0.7,
-            max_tokens=800,
-            response_format={"type": "json_object"}
-        )
-        
-        ai_content = response.choices[0].message.content
-        ai_data = json.loads(ai_content)
-        
-        # Delete old actions
+        ai_data = _generate_breakdown(session["first_message"])
+
         db.client.table("actions")\
             .delete()\
             .eq("session_id", str(session_id))\
             .execute()
-        
-        # Update session with new AI data
+
         db.client.table("sessions")\
             .update({
                 "blocker_type": ai_data["blocker_type"],
@@ -220,8 +194,7 @@ async def regenerate_breakdown(
             })\
             .eq("id", str(session_id))\
             .execute()
-        
-        # Create new actions
+
         actions_to_insert = [
             {
                 "session_id": str(session_id),
@@ -232,9 +205,9 @@ async def regenerate_breakdown(
             }
             for action in ai_data["actions"]
         ]
-        
+
         actions_result = db.client.table("actions").insert(actions_to_insert).execute()
-        
+
         action_responses = [
             ActionResponse(
                 id=a["id"],
@@ -248,7 +221,7 @@ async def regenerate_breakdown(
             )
             for a in actions_result.data
         ]
-        
+
         return BreakdownResponse(
             session_id=str(session_id),
             blocker_type=ai_data["blocker_type"],
@@ -256,11 +229,11 @@ async def regenerate_breakdown(
             actions=action_responses,
             suggested_questions=ai_data.get("suggested_questions")
         )
-        
-    except openai.error.OpenAIError as e:
+
+    except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"OpenAI API error: {str(e)}"
+            detail=str(e),
         )
     except Exception as e:
         raise HTTPException(

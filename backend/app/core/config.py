@@ -10,8 +10,9 @@ Why Pydantic Settings?
 - Easy to test (can override settings in tests)
 """
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings
-from typing import Optional
+from typing import Literal, Optional
 
 
 class Settings(BaseSettings):
@@ -39,10 +40,26 @@ class Settings(BaseSettings):
     SUPABASE_SERVICE_KEY: str  # service_role key (bypasses RLS)
     
     # ============================================
-    # AI / LLM
+    # AI / LLM (v1 uses Gemini Flash; OpenAI optional for later)
     # ============================================
-    OPENAI_API_KEY: str  # Required
-    ANTHROPIC_API_KEY: Optional[str] = None  # Optional fallback
+    LLM_PROVIDER: Literal["openai", "gemini"] = "gemini"
+    GEMINI_API_KEY: Optional[str] = None
+    GEMINI_MODEL: str = "gemini-2.0-flash"
+    OPENAI_API_KEY: Optional[str] = None
+    OPENAI_MODEL: str = "gpt-4o-mini"
+
+    @model_validator(mode="after")
+    def validate_llm_provider_keys(self) -> "Settings":
+        if self.LLM_PROVIDER == "gemini" and not self.GEMINI_API_KEY:
+            raise ValueError(
+                "GEMINI_API_KEY is required for v1. "
+                "Get one at https://aistudio.google.com/apikey"
+            )
+        if self.LLM_PROVIDER == "openai" and not self.OPENAI_API_KEY:
+            raise ValueError(
+                "OPENAI_API_KEY is required when LLM_PROVIDER=openai."
+            )
+        return self
     
     # ============================================
     # REDIS (for background jobs)

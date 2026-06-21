@@ -12,9 +12,9 @@ email-validator==2.1.1
 supabase>=2.31.0
 websockets>=13.0
 
-# AI
-openai==1.25.0
-anthropic==0.25.0
+# AI (v1: Gemini Flash)
+google-generativeai==0.8.4
+# Optional later: openai==1.25.0
 
 # Background Jobs
 redis==5.0.3
