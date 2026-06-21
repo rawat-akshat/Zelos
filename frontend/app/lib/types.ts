@@ -11,17 +11,32 @@ export type TimelineEventType =
   | "experiment_started"
   | "experiment_reviewed";
 
+export type GoalMomentum = "good" | "at_risk" | "stalled";
+
+export interface GoalRecentEvent {
+  id: string;
+  title: string;
+}
+
 export interface Goal {
   id: string;
   title: string;
   description?: string;
-  currentState?: string;
-  lastAction?: string;
-  nextSuggestedAction?: string;
   status: GoalStatus;
-  detectedPatternsCount: number;
+  currentFocus: string;
+  nextStep: string;
+  momentum: GoalMomentum;
+  patternsObservedCount: number;
+  primaryPatternName?: string;
+  lastActiveAt: Date;
+  pauseReason?: string;
+  completedSummary?: string;
+  keyLearning?: string;
+  recentEvents: GoalRecentEvent[];
+  activeExperiments: string[];
+  completedLearnings?: string[];
   createdAt: Date;
-  updatedAt: Date;
+  lastAction?: string;
 }
 
 export interface TimelineEvent {
@@ -60,6 +75,77 @@ export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   intervention?: Intervention;
+}
+
+export interface InsightPatternGoal {
+  goalId: string;
+  goalTitle: string;
+  count: number;
+}
+
+export interface InsightPattern {
+  id: string;
+  name: string;
+  description: string;
+  confidence: number;
+  observedCount: number;
+  lastObservedAt: string;
+  goals: InsightPatternGoal[];
+  trend?: "increasing" | "decreasing" | "stable";
+}
+
+export interface PatternOccurrence {
+  id: string;
+  patternId: string;
+  goalId: string;
+  goalTitle: string;
+  conversationId: string;
+  messageId: string;
+  confidence: number;
+  evidenceText: string;
+  messagePreview: string;
+  createdAt: string;
+}
+
+export interface BehavioralProfileMetric {
+  label: string;
+  value: number;
+}
+
+export interface InsightsTimelineItem {
+  id: string;
+  type: string;
+  title: string;
+  goalTitle: string;
+  createdAt: Date;
+}
+
+export interface BehavioralExperiment {
+  id: string;
+  title: string;
+  goalTitle: string;
+  status: "active" | "completed";
+  date: Date;
+}
+
+export interface InsightsPageData {
+  hasData: boolean;
+  summary: {
+    activeGoals: number;
+    patternsDetected: number;
+    playbookRulesLearned: number;
+    experimentsCompleted: number;
+  };
+  behavioralProfile: BehavioralProfileMetric[];
+  patterns: InsightPattern[];
+  occurrences: PatternOccurrence[];
+  playbook: {
+    worksWell: string[];
+    doesNotWork: string[];
+  };
+  timeline: InsightsTimelineItem[];
+  activeExperiments: BehavioralExperiment[];
+  completedExperiments: BehavioralExperiment[];
 }
 
 export interface PersonalPlaybook {
@@ -140,6 +226,14 @@ export interface Session {
   isCompleted: boolean;
 }
 
+export interface ProfileSnapshot {
+  activeGoals: number;
+  patternsIdentified: number;
+  playbookRulesLearned: number;
+  goalsCompleted: number;
+}
+
+/** @deprecated Use ProfileSnapshot on Profile page */
 export interface UserUsage {
   goalsActive: number;
   messagesThisMonth: number;

@@ -9,7 +9,7 @@ interface NextStepCardProps {
 }
 
 export default function NextStepCard({
-  nextStep = mockActiveGoal.nextSuggestedAction,
+  nextStep = mockActiveGoal.nextStep,
   empty = false,
 }: NextStepCardProps) {
   return (

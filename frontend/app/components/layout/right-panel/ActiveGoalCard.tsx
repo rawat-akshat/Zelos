@@ -32,9 +32,9 @@ export default function ActiveGoalCard({ goal }: ActiveGoalCardProps) {
             {g.title}
           </h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <Row label="Current State" value={g.currentState ?? "—"} />
+            <Row label="Current Focus" value={g.currentFocus} highlight />
             <Row label="Last Action" value={g.lastAction ?? "—"} />
-            <Row label="Suggested Next Step" value={g.nextSuggestedAction ?? "—"} highlight />
+            <Row label="Next Step" value={g.nextStep} />
           </div>
         </>
       )}

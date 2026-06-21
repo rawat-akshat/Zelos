@@ -42,7 +42,7 @@ export default function RightPanel({
       <ActiveGoalCard goal={empty ? null : activeGoal} />
       {!empty && <GoalTimelineCard events={timelineEvents} />}
       <PatternsNoticedCard patterns={empty ? [] : patterns} empty={empty} />
-      <NextStepCard nextStep={empty ? null : activeGoal?.nextSuggestedAction} empty={empty} />
+      <NextStepCard nextStep={empty ? null : activeGoal?.nextStep} empty={empty} />
     </aside>
   );
 }

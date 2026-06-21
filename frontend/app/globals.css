@@ -38,6 +38,7 @@
   --success-dim: rgba(122, 155, 118, 0.15);
   --error: #A66B6B;
   --error-dim: rgba(166, 107, 107, 0.12);
+  --danger: #A66B6B;
 
   --border: #DDD2C2;
   --border-accent: rgba(201, 168, 90, 0.35);
@@ -101,6 +102,261 @@ body {
 
 .font-body {
   font-family: var(--font-body);
+}
+
+/* App button system */
+.zelos-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 180ms var(--ease),
+    border-color 180ms var(--ease),
+    color 180ms var(--ease),
+    opacity 180ms var(--ease);
+}
+
+.zelos-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.zelos-btn-full {
+  width: 100%;
+}
+
+.zelos-btn-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.zelos-btn-row .zelos-btn {
+  width: 100%;
+  min-width: 0;
+}
+
+.zelos-setting-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.zelos-setting-row:first-child {
+  padding-top: 20px;
+}
+
+.zelos-setting-row:last-child {
+  border-bottom: none;
+  padding-bottom: 20px;
+}
+
+.zelos-setting-row-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Settings page layout */
+.zelos-settings-section-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 14px;
+}
+
+.zelos-settings-card {
+  overflow: hidden;
+}
+
+.zelos-settings-card--danger {
+  border-color: rgba(166, 107, 107, 0.28) !important;
+}
+
+.zelos-choice-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 20px 24px;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: background 180ms var(--ease);
+}
+
+.zelos-choice-item:last-child {
+  border-bottom: none;
+}
+
+.zelos-choice-item:hover {
+  background: var(--bg-card-hover);
+}
+
+.zelos-choice-item--selected {
+  background: var(--accent-glow);
+}
+
+.zelos-choice-item--selected:hover {
+  background: var(--accent-glow-md, rgba(201, 168, 90, 0.14));
+}
+
+.zelos-radio-compact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 24px;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: background 180ms var(--ease);
+}
+
+.zelos-radio-compact-item:last-child {
+  border-bottom: none;
+}
+
+.zelos-radio-compact-item:hover {
+  background: var(--bg-card-hover);
+}
+
+.zelos-radio-compact-item--selected {
+  background: var(--accent-glow);
+}
+
+.zelos-radio-compact-content {
+  flex: 1;
+  min-width: 0;
+  padding-top: 1px;
+}
+
+.zelos-radio-compact-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 2px;
+  line-height: 1.35;
+}
+
+.zelos-radio-compact-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.zelos-plan-block {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.zelos-deletion-scheduled {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.zelos-deletion-scheduled-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--danger);
+  margin: 0;
+}
+
+.zelos-list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 56px;
+  padding: 16px 24px;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background 180ms var(--ease);
+}
+
+.zelos-list-row:last-child {
+  border-bottom: none;
+}
+
+.zelos-list-row:hover {
+  background: var(--bg-card-hover);
+}
+
+.zelos-badge-muted {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.zelos-account-block {
+  padding: 24px;
+}
+
+.zelos-account-meta {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.zelos-settings-action-below {
+  margin-top: 12px;
+}
+
+.zelos-danger-block {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.zelos-photo-upload {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+@media (max-width: 480px) {
+  .zelos-btn-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 ::-webkit-scrollbar {

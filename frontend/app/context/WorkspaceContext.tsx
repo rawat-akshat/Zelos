@@ -34,13 +34,15 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       id: `goal-${Date.now()}`,
       title,
       description: title,
-      currentState: "Getting started",
-      lastAction: undefined,
-      nextSuggestedAction: "Share what's on your mind in the workspace",
+      currentFocus: "Getting started",
+      nextStep: "Share what's on your mind in the workspace",
+      momentum: "good",
+      patternsObservedCount: 0,
+      lastActiveAt: now,
       status: "active",
-      detectedPatternsCount: 0,
+      recentEvents: [],
+      activeExperiments: [],
       createdAt: now,
-      updatedAt: now,
     });
   }, []);
 

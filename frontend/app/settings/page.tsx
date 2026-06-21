@@ -1,20 +1,491 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import AppShell from "../components/layout/AppShell";
 import PageContent from "../components/layout/PageContent";
 import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
+import EditProfileModal from "../components/profile/EditProfileModal";
+import UpgradeProModal from "../components/profile/UpgradeProModal";
+import DeleteAccountModal from "../components/settings/DeleteAccountModal";
 import { mockUser } from "../lib/mock-data";
-import {
-  Bell,
-  BellOff,
-  Shield,
-  User,
-  Palette,
-  Trash2,
-  ChevronRight,
-} from "lucide-react";
+
+type CoachingStyle = "supportive" | "balanced" | "direct";
+
+const COACHING_STYLES: Array<{
+  id: CoachingStyle;
+  label: string;
+  description: string;
+  isDefault?: boolean;
+}> = [
+  {
+    id: "supportive",
+    label: "Supportive",
+    description: "Encouraging and reflective.",
+  },
+  {
+    id: "balanced",
+    label: "Balanced",
+    description: "Supportive with occasional challenges.",
+    isDefault: true,
+  },
+  {
+    id: "direct",
+    label: "Direct",
+    description: "Clear observations and accountability.",
+  },
+];
+
+function formatMemberSince(date: Date) {
+  return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+}
+
+function formatDeletionDate(date: Date) {
+  return date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+}
+
+function formatRenewalDate(date: Date) {
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+function addDays(date: Date, days: number): Date {
+  return new Date(date.getTime() + days * 86400000);
+}
+
+export default function SettingsPage() {
+  const [name, setName] = useState(mockUser.name);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(mockUser.avatarUrl);
+  const [editOpen, setEditOpen] = useState(false);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deletionScheduledFor, setDeletionScheduledFor] = useState<Date | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const [coachingStyle, setCoachingStyle] = useState<CoachingStyle>("balanced");
+  const [goalCheckins, setGoalCheckins] = useState(true);
+  const [weeklyReflection, setWeeklyReflection] = useState(false);
+  const [patternAlerts, setPatternAlerts] = useState(true);
+
+  const isPremium = mockUser.plan === "Premium";
+  const showUpgrade = !isPremium;
+
+  const showToast = (message: string) => {
+    setToast(message);
+    setTimeout(() => setToast(null), 3200);
+  };
+
+  const handleScheduleDeletion = () => {
+    setDeletionScheduledFor(addDays(new Date(), 30));
+    showToast("Account scheduled for deletion in 30 days.");
+  };
+
+  const handleRestoreAccount = () => {
+    setDeletionScheduledFor(null);
+    showToast("Account restored.");
+  };
+
+  return (
+    <AppShell>
+      <EditProfileModal
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        name={name}
+        email={mockUser.email}
+        avatarUrl={avatarUrl}
+        onSave={({ name: nextName, avatarUrl: nextAvatar }) => {
+          setName(nextName);
+          setAvatarUrl(nextAvatar);
+          showToast("Profile updated.");
+        }}
+      />
+      <UpgradeProModal
+        open={upgradeOpen}
+        onClose={() => setUpgradeOpen(false)}
+        onNotify={() => {
+          setUpgradeOpen(false);
+          showToast("We'll let you know when Pro is available.");
+        }}
+      />
+      <DeleteAccountModal
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onConfirm={handleScheduleDeletion}
+      />
+
+      <PageContent
+        title="Settings"
+        subtitle="Manage your account and coaching preferences."
+        maxWidth={560}
+      >
+        <SettingSection title="Account">
+          <Card padding="none" className="zelos-settings-card">
+            <AccountProfileCard
+              name={name}
+              email={mockUser.email}
+              memberSince={formatMemberSince(mockUser.memberSince)}
+              loginMethod={mockUser.loginMethod}
+              avatarUrl={avatarUrl}
+            />
+          </Card>
+          <Button
+            variant="secondary"
+            fullWidth
+            className="zelos-settings-action-below"
+            onClick={() => setEditOpen(true)}
+          >
+            Edit Profile
+          </Button>
+        </SettingSection>
+
+        <SettingSection title="Coaching Preferences">
+          <Card padding="none" className="zelos-settings-card">
+            <CoachingStyleGroup
+              value={coachingStyle}
+              onChange={setCoachingStyle}
+              options={COACHING_STYLES}
+            />
+          </Card>
+        </SettingSection>
+
+        <SettingSection title="Coaching & Reminders">
+          <Card padding="none" className="zelos-settings-card">
+            <ToggleRow
+              label="Goal Check-ins"
+              description="Receive reminders when goals become inactive."
+              checked={goalCheckins}
+              onChange={setGoalCheckins}
+            />
+            <ToggleRow
+              label="Weekly Reflection"
+              description="Receive a weekly summary of patterns, progress, and insights."
+              checked={weeklyReflection}
+              onChange={setWeeklyReflection}
+            />
+            <ToggleRow
+              label="Pattern Alerts"
+              description="Get notified when Zelos notices recurring behavioral patterns."
+              checked={patternAlerts}
+              onChange={setPatternAlerts}
+            />
+          </Card>
+        </SettingSection>
+
+        <SettingSection title="Current Plan">
+          <Card padding="none" className="zelos-settings-card">
+            <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12 }}>
+              <MetaLine label="Plan" value={isPremium ? "Premium" : mockUser.plan} />
+              {isPremium && mockUser.premiumRenewalDate ? (
+                <MetaLine label="Renewal" value={formatRenewalDate(mockUser.premiumRenewalDate)} />
+              ) : (
+                <MetaLine label="Status" value={mockUser.planStatus} />
+              )}
+            </div>
+          </Card>
+          {showUpgrade && (
+            <Button
+              variant="primary"
+              fullWidth
+              className="zelos-settings-action-below"
+              onClick={() => setUpgradeOpen(true)}
+            >
+              Upgrade
+            </Button>
+          )}
+        </SettingSection>
+
+        <SettingSection
+          title="Your Data"
+          description="You own your data. Export controls are being expanded."
+        >
+          <Card padding="none" className="zelos-settings-card">
+            <DataAction label="Export Conversations" onClick={() => showToast("Coming soon.")} />
+            <DataAction label="Export Goals" onClick={() => showToast("Coming soon.")} />
+            <DataAction label="Export Insights" onClick={() => showToast("Coming soon.")} />
+          </Card>
+        </SettingSection>
+
+        <SettingSection title="Danger Zone" danger>
+          {deletionScheduledFor ? (
+            <>
+              <Card padding="none" className="zelos-settings-card zelos-settings-card--danger">
+                <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 14 }}>
+                  <p style={{ fontSize: 15, fontWeight: 500, color: "var(--danger)", margin: 0 }}>
+                    Account Scheduled For Deletion
+                  </p>
+                  <MetaLine label="Deletion Date" value={formatDeletionDate(deletionScheduledFor)} />
+                  <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.55, margin: 0 }}>
+                    You may restore your account before this date.
+                  </p>
+                </div>
+              </Card>
+              <Button
+                variant="primary"
+                fullWidth
+                className="zelos-settings-action-below"
+                onClick={handleRestoreAccount}
+              >
+                Restore Account
+              </Button>
+            </>
+          ) : (
+            <>
+              <Card padding="none" className="zelos-settings-card zelos-settings-card--danger">
+                <div style={{ padding: 24 }}>
+                  <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6, margin: 0 }}>
+                    Schedule account deletion with a 30-day recovery window.
+                  </p>
+                </div>
+              </Card>
+              <Button
+                variant="dangerOutline"
+                fullWidth
+                className="zelos-settings-action-below"
+                onClick={() => setDeleteOpen(true)}
+              >
+                Delete Account
+              </Button>
+            </>
+          )}
+        </SettingSection>
+
+        <div style={{ textAlign: "center", paddingTop: 8 }}>
+          <p style={{ fontSize: 12, color: "var(--text-muted)" }}>Zelos · v1.0.0-beta</p>
+        </div>
+      </PageContent>
+
+      {toast && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 28,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 60,
+            padding: "12px 20px",
+            borderRadius: 10,
+            background: "var(--bg-card)",
+            border: "1px solid var(--border)",
+            boxShadow: "var(--shadow-md)",
+            fontSize: 14,
+            color: "var(--text-primary)",
+          }}
+        >
+          {toast}
+        </div>
+      )}
+    </AppShell>
+  );
+}
+
+function AccountProfileCard({
+  name,
+  email,
+  memberSince,
+  loginMethod,
+  avatarUrl,
+}: {
+  name: string;
+  email: string;
+  memberSince: string;
+  loginMethod: string;
+  avatarUrl: string | null;
+}) {
+  const initials = getInitials(name);
+
+  return (
+    <div className="zelos-account-block">
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 18 }}>
+        {avatarUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={avatarUrl}
+            alt=""
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: "50%",
+              objectFit: "cover",
+              flexShrink: 0,
+              border: "1px solid var(--border)",
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: "50%",
+              flexShrink: 0,
+              background: "var(--accent-glow)",
+              border: "1px solid var(--border-accent)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 20,
+              fontWeight: 600,
+              color: "var(--text-primary)",
+            }}
+          >
+            {initials}
+          </div>
+        )}
+
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p className="font-heading" style={{ fontSize: 20, color: "var(--text-primary)", margin: "0 0 4px" }}>
+            {name}
+          </p>
+          <p style={{ fontSize: 14, color: "var(--text-secondary)", margin: "0 0 6px", wordBreak: "break-word" }}>
+            {email}
+          </p>
+          <p style={{ fontSize: 12, color: "var(--text-muted)", margin: 0, lineHeight: 1.45 }}>
+            Email changes will be supported in a future update.
+          </p>
+        </div>
+      </div>
+
+      <div className="zelos-account-meta">
+        <MetaLine label="Member Since" value={memberSince} />
+        <MetaLine label="Login Method" value={loginMethod} />
+      </div>
+    </div>
+  );
+}
+
+function MetaLine({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", gap: 16, fontSize: 13 }}>
+      <span style={{ color: "var(--text-muted)", flexShrink: 0 }}>{label}</span>
+      <span style={{ color: "var(--text-secondary)", textAlign: "right" }}>{value}</span>
+    </div>
+  );
+}
+
+function CoachingStyleGroup({
+  value,
+  onChange,
+  options,
+}: {
+  value: CoachingStyle;
+  onChange: (value: CoachingStyle) => void;
+  options: typeof COACHING_STYLES;
+}) {
+  return (
+    <div role="radiogroup" aria-label="Coaching style" style={{ display: "flex", flexDirection: "column" }}>
+      {options.map((option, index) => {
+        const selected = value === option.id;
+        return (
+          <div
+            key={option.id}
+            role="radio"
+            aria-checked={selected}
+            tabIndex={selected ? 0 : -1}
+            onClick={() => onChange(option.id)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onChange(option.id);
+              }
+            }}
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 12,
+              width: "100%",
+              padding: "14px 24px",
+              borderBottom: index < options.length - 1 ? "1px solid var(--border)" : "none",
+              background: selected ? "var(--accent-glow)" : "transparent",
+              cursor: "pointer",
+            }}
+          >
+            <span
+              aria-hidden
+              style={{
+                width: 16,
+                height: 16,
+                marginTop: 2,
+                borderRadius: "50%",
+                border: `2px solid ${selected ? "var(--accent)" : "var(--border)"}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              {selected && (
+                <span
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: "50%",
+                    background: "var(--accent)",
+                  }}
+                />
+              )}
+            </span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: "var(--text-primary)",
+                  lineHeight: 1.35,
+                  marginBottom: 2,
+                }}
+              >
+                {option.label}
+                {option.isDefault && (
+                  <span style={{ fontSize: 12, fontWeight: 400, color: "var(--text-muted)", marginLeft: 6 }}>
+                    (Default)
+                  </span>
+                )}
+              </div>
+              <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.4 }}>
+                {option.description}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ToggleRow({
+  label,
+  description,
+  checked,
+  onChange,
+}: {
+  label: string;
+  description?: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <div className="zelos-setting-row">
+      <div className="zelos-setting-row-content">
+        <div style={{ fontSize: 14, fontWeight: 500, color: "var(--text-primary)", lineHeight: 1.4 }}>
+          {label}
+        </div>
+        {description && (
+          <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.5, marginTop: 6 }}>
+            {description}
+          </div>
+        )}
+      </div>
+      <Toggle checked={checked} onChange={onChange} label={label} />
+    </div>
+  );
+}
 
 function Toggle({
   checked,
@@ -31,70 +502,55 @@ function Toggle({
       aria-checked={checked}
       aria-label={label}
       onClick={() => onChange(!checked)}
-      className="relative flex-shrink-0 rounded-full transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
       style={{
+        position: "relative",
+        flexShrink: 0,
+        marginTop: 2,
+        borderRadius: 999,
         background: checked ? "var(--accent)" : "var(--progress-track)",
-        height: 22,
-        width: 40,
+        height: 24,
+        width: 44,
+        border: "none",
+        cursor: "pointer",
+        transition: "background 180ms var(--ease)",
       }}
     >
-      <div
-        className="absolute top-0.5 rounded-full bg-white shadow transition-all duration-200"
+      <span
         style={{
+          position: "absolute",
+          top: 3,
+          left: checked ? 23 : 3,
           width: 18,
           height: 18,
-          left: checked ? 20 : 2,
+          borderRadius: "50%",
+          background: "#fff",
+          boxShadow: "var(--shadow-sm)",
+          transition: "left 180ms var(--ease)",
         }}
       />
     </button>
   );
 }
 
-function SettingRow({
-  icon: Icon,
-  label,
-  description,
-  children,
-  borderless,
-}: {
-  icon: React.ElementType;
-  label: string;
-  description?: string;
-  children?: React.ReactNode;
-  borderless?: boolean;
-}) {
+function DataAction({ label, onClick }: { label: string; onClick: () => void }) {
   return (
-    <div
-      className={`flex items-center gap-4 py-3.5 ${borderless ? "" : "border-b last:border-b-0"}`}
-      style={{ borderColor: "var(--border)" }}
-    >
-      <div
-        className="w-8 h-8 rounded-[8px] flex items-center justify-center flex-shrink-0"
-        style={{ background: "var(--nav-hover-bg)" }}
-      >
-        <Icon size={15} style={{ color: "var(--text-muted)" }} strokeWidth={1.75} />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-          {label}
-        </p>
-        {description && (
-          <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
-            {description}
-          </p>
-        )}
-      </div>
-      {children}
-    </div>
+    <button type="button" onClick={onClick} className="zelos-list-row">
+      <span>{label}</span>
+      <span className="zelos-badge-muted">Coming soon</span>
+    </button>
   );
 }
 
 function SettingSection({
   title,
+  description,
   children,
+  danger,
 }: {
   title: string;
+  description?: string;
   children: React.ReactNode;
+  danger?: boolean;
 }) {
   return (
     <section>
@@ -104,219 +560,14 @@ function SettingSection({
           fontWeight: 600,
           letterSpacing: "0.1em",
           textTransform: "uppercase",
-          color: "var(--text-muted)",
-          marginBottom: 12,
+          color: danger ? "var(--danger)" : "var(--text-muted)",
+          marginBottom: description ? 8 : 12,
         }}
       >
         {title}
       </p>
-      <Card padding="md">{children}</Card>
+      {description && <p className="zelos-settings-section-desc">{description}</p>}
+      {children}
     </section>
-  );
-}
-
-const THEMES = [
-  { id: "warm", label: "Warm Cream", description: "Default Zelos aesthetic" },
-  { id: "system", label: "System", description: "Match your device settings" },
-] as const;
-
-export default function SettingsPage() {
-  const [notifications, setNotifications] = useState(true);
-  const [emailReminders, setEmailReminders] = useState(false);
-  const [sessionSummaries, setSessionSummaries] = useState(true);
-  const [theme, setTheme] = useState<(typeof THEMES)[number]["id"]>("warm");
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  return (
-    <AppShell>
-      <PageContent title="Settings" subtitle="Manage your account and preferences" maxWidth={560}>
-        <SettingSection title="Account">
-          <SettingRow icon={User} label="Name" description={mockUser.name}>
-            <ChevronRight size={14} style={{ color: "var(--text-muted)" }} />
-          </SettingRow>
-          <SettingRow icon={User} label="Email" description={mockUser.email}>
-            <ChevronRight size={14} style={{ color: "var(--text-muted)" }} />
-          </SettingRow>
-        </SettingSection>
-
-        <SettingSection title="Theme">
-          {THEMES.map((option, i) => (
-            <button
-              key={option.id}
-              type="button"
-              onClick={() => setTheme(option.id)}
-              className="w-full text-left"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 16,
-                padding: "12px 0",
-                borderBottom: i < THEMES.length - 1 ? "1px solid var(--border)" : "none",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              <div
-                className="w-8 h-8 rounded-[8px] flex items-center justify-center flex-shrink-0"
-                style={{ background: "var(--nav-hover-bg)" }}
-              >
-                <Palette size={15} style={{ color: "var(--text-muted)" }} strokeWidth={1.75} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                  {option.label}
-                </p>
-                <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
-                  {option.description}
-                </p>
-              </div>
-              <div
-                style={{
-                  width: 18,
-                  height: 18,
-                  borderRadius: "50%",
-                  border: `2px solid ${theme === option.id ? "var(--accent)" : "var(--border)"}`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                {theme === option.id && (
-                  <div
-                    style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      background: "var(--accent)",
-                    }}
-                  />
-                )}
-              </div>
-            </button>
-          ))}
-        </SettingSection>
-
-        <SettingSection title="Notifications">
-          <SettingRow
-            icon={notifications ? Bell : BellOff}
-            label="Push Notifications"
-            description="Reminders and gentle nudges after sessions"
-          >
-            <Toggle
-              checked={notifications}
-              onChange={setNotifications}
-              label="Toggle push notifications"
-            />
-          </SettingRow>
-          <SettingRow
-            icon={Bell}
-            label="Email Reminders"
-            description="Weekly check-in emails"
-          >
-            <Toggle
-              checked={emailReminders}
-              onChange={setEmailReminders}
-              label="Toggle email reminders"
-            />
-          </SettingRow>
-          <SettingRow
-            icon={Bell}
-            label="Session Summaries"
-            description="Receive a summary after each session"
-            borderless
-          >
-            <Toggle
-              checked={sessionSummaries}
-              onChange={setSessionSummaries}
-              label="Toggle session summaries"
-            />
-          </SettingRow>
-        </SettingSection>
-
-        <SettingSection title="Privacy">
-          <SettingRow
-            icon={Shield}
-            label="Data & Privacy"
-            description="How your sessions and data are stored"
-          >
-            <Link href="/privacy" style={{ color: "var(--text-muted)" }}>
-              <ChevronRight size={14} />
-            </Link>
-          </SettingRow>
-          <SettingRow
-            icon={Shield}
-            label="Export My Data"
-            description="Download a copy of your session history"
-            borderless
-          >
-            <ChevronRight size={14} style={{ color: "var(--text-muted)" }} />
-          </SettingRow>
-        </SettingSection>
-
-        <SettingSection title="Delete Account">
-          {!showDeleteConfirm ? (
-            <SettingRow
-              icon={Trash2}
-              label="Delete Account"
-              description="Permanently remove your account and all session data"
-              borderless
-            >
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(true)}
-                className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
-                style={{
-                  color: "var(--danger, #B85C5C)",
-                  border: "1px solid var(--border)",
-                  background: "transparent",
-                }}
-              >
-                Delete
-              </button>
-            </SettingRow>
-          ) : (
-            <div style={{ padding: "8px 0" }}>
-              <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: 16 }}>
-                This action cannot be undone. All your sessions, progress, and account data will be
-                permanently deleted.
-              </p>
-              <div style={{ display: "flex", gap: 10 }}>
-                <button
-                  type="button"
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="text-sm px-4 py-2 rounded-lg"
-                  style={{
-                    border: "1px solid var(--border)",
-                    color: "var(--text-secondary)",
-                    background: "transparent",
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  className="text-sm px-4 py-2 rounded-lg"
-                  style={{
-                    background: "var(--danger, #B85C5C)",
-                    color: "#fff",
-                    border: "none",
-                  }}
-                >
-                  Confirm Delete
-                </button>
-              </div>
-            </div>
-          )}
-        </SettingSection>
-
-        <div className="text-center pt-2">
-          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-            Zelos · v1.0.0-beta
-          </p>
-        </div>
-      </PageContent>
-    </AppShell>
   );
 }

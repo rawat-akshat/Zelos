@@ -1,22 +1,11 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { NAV_ITEMS } from "./nav-config";
 import NavItem from "./NavItem";
-import { useWorkspace } from "../../context/WorkspaceContext";
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { openNewGoalModal } = useWorkspace();
-
-  const handleStartGoal = () => {
-    openNewGoalModal();
-    if (pathname !== "/dashboard") {
-      router.push("/dashboard");
-    }
-  };
 
   return (
     <aside
@@ -61,7 +50,7 @@ export default function Sidebar() {
         aria-label="Main"
         style={{
           flex: 1,
-          padding: "0 16px",
+          padding: "0 16px 28px",
           display: "flex",
           flexDirection: "column",
           gap: "6px",
@@ -71,41 +60,6 @@ export default function Sidebar() {
           <NavItem key={item.href} {...item} active={pathname === item.href} />
         ))}
       </nav>
-
-      <div style={{ padding: "0 16px 28px", flexShrink: 0 }}>
-        <button
-          type="button"
-          onClick={handleStartGoal}
-          style={{
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-            padding: "11px 16px",
-            borderRadius: 10,
-            background: "var(--accent-glow)",
-            border: "1px solid var(--border-accent)",
-            color: "var(--text-primary)",
-            fontSize: 13,
-            fontWeight: 500,
-            cursor: "pointer",
-            fontFamily: "var(--font-body)",
-            transition: "all 180ms",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "var(--accent)";
-            e.currentTarget.style.color = "var(--accent-on)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "var(--accent-glow)";
-            e.currentTarget.style.color = "var(--text-primary)";
-          }}
-        >
-          <Plus size={16} strokeWidth={2} />
-          Start Goal
-        </button>
-      </div>
     </aside>
   );
 }
