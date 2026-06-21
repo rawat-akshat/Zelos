@@ -5,22 +5,25 @@ import { Sparkles } from "lucide-react";
 
 const SUGGESTIONS = [
   {
+    label: "Research Spiral",
     preview:
-      "I've been wanting to build a startup for months, but I keep researching instead of building. Every time I choose a direction, I find something else to analyze. How do I stop going in circles and finally move forward?",
+      "I've been wanting to build a startup for months, but I keep researching instead of building. Every time I choose a direction, I find another idea, competitor, or strategy to analyze. I tell myself I'm being thorough, but deep down I wonder if I'm avoiding the risk of committing to something. How do I stop going in circles and finally move forward?",
     prompt:
-      "I've been wanting to build a startup for months, but I keep researching ideas, competitors, and pricing instead of actually building anything. Every time I decide on a direction, I find another thing to analyze and end up back at square one. I know I should just start, but I can't seem to move forward. Can you help me understand what's keeping me stuck and what the smallest next step should be?",
+      "I've been wanting to build a startup for months, but I keep researching instead of building. Every time I choose a direction, I find another idea, competitor, or strategy to analyze. I tell myself I'm being thorough, but deep down I wonder if I'm avoiding the risk of committing to something. How do I stop going in circles and finally move forward?",
   },
   {
+    label: "Career Uncertainty",
     preview:
-      "I need to prepare for interviews and apply for jobs, but there are so many things to do that I keep postponing all of them. How do I break this down and start making progress?",
+      "I'm in college and everyone around me seems to know what they're working toward. Some people are preparing for placements, some want to pursue higher studies, and others are building startups. Meanwhile, I keep changing my mind about what I want to do. The more I think about my future, the more confused I become. Why does everyone else seem so certain while I feel stuck?",
     prompt:
-      "I need to prepare for interviews and apply for jobs, but the whole process feels overwhelming. There are resumes, applications, coding practice, networking, and I don't know where to start. Because everything feels important, I keep postponing all of it and then feel guilty for not making progress. Can you help me break this down?",
+      "I'm in college and everyone around me seems to know what they're working toward. Some people are preparing for placements, some want to pursue higher studies, and others are building startups. Meanwhile, I keep changing my mind about what I want to do. The more I think about my future, the more confused I become. Why does everyone else seem so certain while I feel stuck?",
   },
   {
+    label: "Overwhelm & Avoidance",
     preview:
-      "I've been focused on work and responsibilities for years, but lately I'm unsure what I actually want next. How do I gain clarity and decide what direction feels right?",
+      "My apartment is a mess, I have messages I haven't replied to, bills I need to pay, and a growing list of things I've been putting off. None of them are particularly difficult, but together they feel overwhelming. Instead of starting, I keep distracting myself and feeling guilty about it afterward. How do I get unstuck?",
     prompt:
-      "For the past few years, I've been focused on work and responsibilities, but lately I feel like I'm just going through the motions. There are things I'd like to change or explore, but every option seems uncertain and I keep second-guessing myself. The more I think about it, the more confused I become. Can you help me sort through my thoughts and figure out what direction feels right?",
+      "My apartment is a mess, I have messages I haven't replied to, bills I need to pay, and a growing list of things I've been putting off. None of them are particularly difficult, but together they feel overwhelming. Instead of starting, I keep distracting myself and feeling guilty about it afterward. How do I get unstuck?",
   },
 ];
 
@@ -86,7 +89,20 @@ export default function SuggestionCards({ onSelect }: SuggestionCardsProps) {
               style={{ color: "var(--accent)", flexShrink: 0, marginTop: 2 }}
               aria-hidden
             />
-            <span>{suggestion.preview}</span>
+            <span style={{ display: "flex", flexDirection: "column", gap: 6, minWidth: 0 }}>
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 600,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "var(--text-muted)",
+                }}
+              >
+                {suggestion.label}
+              </span>
+              <span>{suggestion.preview}</span>
+            </span>
           </motion.button>
         ))}
       </div>

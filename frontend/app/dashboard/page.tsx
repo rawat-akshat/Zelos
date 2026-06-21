@@ -353,7 +353,7 @@ function DashboardContent() {
                   >
                     <SuggestionCards onSelect={handleSuggestionSelect} />
                   </motion.div>
-                  {isNewUser && (
+                  {/* {isNewUser && (
                     <div style={{ textAlign: "center", marginTop: 28 }}>
                       <button
                         type="button"
@@ -373,7 +373,7 @@ function DashboardContent() {
                         Or start a named goal
                       </button>
                     </div>
-                  )}
+                  )} */}
                 </motion.div>
               )}
             </AnimatePresence>
