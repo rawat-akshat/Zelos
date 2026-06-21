@@ -250,6 +250,34 @@ export const api = {
     });
   },
 
+  async uploadAvatar(file: File): Promise<ApiUser> {
+    const authToken = getStoredToken();
+    const form = new FormData();
+    form.append("file", file);
+    const headers: Record<string, string> = {};
+    if (authToken) headers.Authorization = `Bearer ${authToken}`;
+
+    const res = await fetch(`${API_BASE}/profile/avatar`, {
+      method: "POST",
+      headers,
+      body: form,
+    });
+    if (!res.ok) {
+      let detail = res.statusText;
+      try {
+        const body = await res.json();
+        detail =
+          typeof body.detail === "string"
+            ? body.detail
+            : JSON.stringify(body.detail);
+      } catch {
+        /* ignore */
+      }
+      throw new ApiError(String(detail || "Upload failed"), res.status);
+    }
+    return res.json() as Promise<ApiUser>;
+  },
+
   listSessions() {
     return apiFetch<{ sessions: ApiSession[]; total: number }>("/sessions");
   },

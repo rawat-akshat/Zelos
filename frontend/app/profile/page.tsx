@@ -15,6 +15,7 @@ import EditProfileModal from "../components/profile/EditProfileModal";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
 import { formatApiError } from "../lib/api-errors";
+import { saveProfileChanges, profileSaveErrorMessage } from "../lib/profile-save";
 
 const FREE_PLAN_FEATURES = [
   "Limited active goals",
@@ -117,15 +118,20 @@ export default function ProfilePage() {
         name={name}
         email={email}
         avatarUrl={avatarUrl}
-        onSave={async ({ name: nextName, avatarUrl: nextAvatar }) => {
+        onSave={async ({ name: nextName, avatarFile }) => {
           try {
-            await api.updateMe({ name: nextName, avatar_url: nextAvatar ?? undefined });
-            setName(nextName);
-            setAvatarUrl(nextAvatar);
+            const saved = await saveProfileChanges({
+              name: nextName,
+              avatarFile,
+              currentName: name,
+            });
+            setName(saved.name);
+            if (saved.avatarUrl !== undefined) setAvatarUrl(saved.avatarUrl);
             await refreshUser();
             showToast("Profile updated.");
           } catch (err) {
-            showToast(formatApiError(err));
+            showToast(profileSaveErrorMessage(err));
+            throw err;
           }
         }}
       />

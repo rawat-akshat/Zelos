@@ -87,3 +87,29 @@ Zelos requires a verified inbox for email/password signups (Google OAuth is pre-
 
 After signup, users land on `/auth/verify-email` until they click the link in their inbox.
 Confirmation links redirect to `/auth/callback`, then the app sends them to the workspace.
+
+## Profile photo storage (Supabase Storage)
+
+The backend uploads avatars to the **`avatars`** bucket via `POST /api/v1/profile/avatar`.
+Storage code lives in `backend/app/storage/` (Supabase today; swap to S3 by changing `STORAGE_PROVIDER`).
+
+### What you need to do once
+
+1. **Enable Storage** in Supabase Dashboard (if not already).
+2. **SQL Editor** — run `migrations/20260318120000_avatars_storage.sql`  
+   Creates public **`avatars`** bucket (5 MB max, images only).
+3. **No extra env vars required** — uses existing `SUPABASE_URL` + `SUPABASE_SERVICE_KEY`.
+
+Optional backend `.env` overrides:
+
+```env
+STORAGE_PROVIDER=supabase
+AVATAR_BUCKET=avatars
+```
+
+### Behavior
+
+- Upload path: `{user_id}/avatar.jpg` (or `.png` / `.webp` / `.gif`)
+- **Replacing a photo deletes** the previous file(s) under that user’s folder, then uploads the new one
+- Public URL is saved in `users.avatar_url` and persists across refresh
+- Google profile photos are unchanged (external URLs are not deleted)

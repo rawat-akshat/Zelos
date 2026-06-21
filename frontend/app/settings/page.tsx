@@ -12,6 +12,7 @@ import DeleteAccountModal from "../components/settings/DeleteAccountModal";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
 import { formatApiError } from "../lib/api-errors";
+import { saveProfileChanges, profileSaveErrorMessage } from "../lib/profile-save";
 import InlineAlert from "../components/ui/InlineAlert";
 
 type CoachingStyle = "supportive" | "balanced" | "direct";
@@ -67,7 +68,7 @@ function addDays(date: Date, days: number): Date {
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { user, isAuthenticated, loading: authLoading, refreshUser } = useAuth();
+  const { user, isAuthenticated, loading: authLoading, refreshUser, signOut } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -167,15 +168,20 @@ export default function SettingsPage() {
         name={name}
         email={email}
         avatarUrl={avatarUrl}
-        onSave={async ({ name: nextName, avatarUrl: nextAvatar }) => {
+        onSave={async ({ name: nextName, avatarFile }) => {
           try {
-            await api.updateMe({ name: nextName, avatar_url: nextAvatar ?? undefined });
-            setName(nextName);
-            setAvatarUrl(nextAvatar);
+            const saved = await saveProfileChanges({
+              name: nextName,
+              avatarFile,
+              currentName: name,
+            });
+            setName(saved.name);
+            if (saved.avatarUrl !== undefined) setAvatarUrl(saved.avatarUrl);
             await refreshUser();
             showToast("Profile updated.");
           } catch (err) {
-            showToast(formatApiError(err));
+            showToast(profileSaveErrorMessage(err));
+            throw err;
           }
         }}
       />
@@ -215,6 +221,15 @@ export default function SettingsPage() {
             onClick={() => setEditOpen(true)}
           >
             Edit Profile
+          </Button>
+          <Button
+            variant="ghost"
+            fullWidth
+            className="zelos-settings-action-below"
+            onClick={() => signOut()}
+            style={{ color: "var(--text-secondary)" }}
+          >
+            Log out
           </Button>
         </SettingSection>
 

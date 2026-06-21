@@ -88,6 +88,12 @@ class Settings(BaseSettings):
     DEV_BACKEND_JWT: Optional[str] = None
     
     # ============================================
+    # OBJECT STORAGE (avatars — Supabase Storage now, S3 later)
+    # ============================================
+    STORAGE_PROVIDER: Literal["supabase", "s3"] = "supabase"
+    AVATAR_BUCKET: str = "avatars"
+
+    # ============================================
     # CORS (which domains can call our API)
     # ============================================
     ALLOWED_ORIGINS: list[str] = [
