@@ -11,6 +11,7 @@ interface RightPanelProps {
   patterns?: Pattern[];
   timelineEvents?: TimelineEvent[];
   isNewUser?: boolean;
+  hasWorkspaceHistory?: boolean;
 }
 
 export default function RightPanel({
@@ -18,8 +19,10 @@ export default function RightPanel({
   patterns,
   timelineEvents,
   isNewUser = false,
+  hasWorkspaceHistory = false,
 }: RightPanelProps) {
   const empty = isNewUser || !activeGoal;
+  const showTimeline = hasWorkspaceHistory && !empty;
 
   return (
     <aside
@@ -40,8 +43,8 @@ export default function RightPanel({
       }}
     >
       <ActiveGoalCard goal={empty ? null : activeGoal} />
-      {!empty && <GoalTimelineCard events={timelineEvents} />}
-      <PatternsNoticedCard patterns={empty ? [] : patterns} empty={empty} />
+      {showTimeline && <GoalTimelineCard events={timelineEvents} />}
+      <PatternsNoticedCard patterns={empty ? [] : patterns} empty={empty || !hasWorkspaceHistory} />
       <NextStepCard nextStep={empty ? null : activeGoal?.nextStep} empty={empty} />
     </aside>
   );

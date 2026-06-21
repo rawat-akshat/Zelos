@@ -23,6 +23,7 @@ function AppShellInner({ children }: AppShellProps) {
     patterns,
     timelineEvents,
     isNewUser,
+    hasWorkspaceHistory,
     newGoalModalOpen,
     closeNewGoalModal,
     startNewGoal,
@@ -125,6 +126,7 @@ function AppShellInner({ children }: AppShellProps) {
           patterns={patterns}
           timelineEvents={timelineEvents}
           isNewUser={isNewUser}
+          hasWorkspaceHistory={hasWorkspaceHistory}
         />
       )}
     </div>

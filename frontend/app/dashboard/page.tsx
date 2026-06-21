@@ -19,7 +19,7 @@ type CenterState = "home" | "chat";
 
 function DashboardContent() {
   const searchParams = useSearchParams();
-  const { activeGoal, isNewUser, openNewGoalModal } = useWorkspace();
+  const { activeGoal, isNewUser, openNewGoalModal, markWorkspaceHistory } = useWorkspace();
   const [centerState, setCenterState] = useState<CenterState>("home");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -45,6 +45,7 @@ function DashboardContent() {
     setCenterState("chat");
     setLoading(true);
     setFloatingIntervention(null);
+    markWorkspaceHistory();
 
     try {
       const turn = await generateCoachTurn(text, turnIndex.current);
@@ -63,7 +64,7 @@ function DashboardContent() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [markWorkspaceHistory]);
 
   const handleSuggestionSelect = useCallback((text: string) => {
     setInputValue(text);
@@ -72,70 +73,102 @@ function DashboardContent() {
 
   const showHero = centerState === "home" && messages.length === 0;
 
+  const inputProps = {
+    value: inputValue,
+    onValueChange: setInputValue,
+    focusKey: inputFocusKey,
+    onSubmit: handleSubmit,
+    loading,
+  };
+
   return (
     <>
       <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
 
       <div style={{ display: "flex", flexDirection: "column", height: "100vh", position: "relative" }}>
-        {activeGoal && (
+        {activeGoal && !showHero && (
           <div
             style={{
               flexShrink: 0,
               padding: "16px 20px 0",
-              borderBottom: showHero ? "none" : "1px solid var(--border)",
+              borderBottom: "1px solid var(--border)",
               maxWidth: 720,
               margin: "0 auto",
               width: "100%",
             }}
           >
-            {!showHero && (
-              <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 4 }}>
-                Active Goal
-              </p>
-            )}
-            {!showHero && (
-              <p className="font-heading" style={{ fontSize: 18, color: "var(--text-primary)", paddingBottom: 12 }}>
-                {activeGoal.title}
-              </p>
-            )}
+            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 4 }}>
+              Active Goal
+            </p>
+            <p className="font-heading" style={{ fontSize: 18, color: "var(--text-primary)", paddingBottom: 12 }}>
+              {activeGoal.title}
+            </p>
           </div>
         )}
-
-        <AnimatePresence mode="wait">
-          {showHero && (
-            <motion.div
-              key="hero"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-              style={{ flexShrink: 0, overflow: "hidden" }}
-            >
-              <CenterHero />
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         <div
           style={{
             flex: 1,
             overflowY: "auto",
-            padding: "8px 20px 0",
+            padding: showHero ? "0 20px" : "8px 20px 0",
             position: "relative",
             zIndex: 1,
             minHeight: 0,
           }}
         >
           <div style={{ maxWidth: 720, margin: "0 auto", width: "100%" }}>
-            {showHero && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.22 }}
-              >
-                <SuggestionCards onSelect={handleSuggestionSelect} />
-              </motion.div>
-            )}
+            <AnimatePresence mode="wait">
+              {showHero && (
+                <motion.div
+                  key="hero"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <CenterHero />
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.28, delay: 0.05 }}
+                    style={{ marginBottom: 28 }}
+                  >
+                    <TaskInput prominent {...inputProps} />
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.28, delay: 0.12 }}
+                  >
+                    <SuggestionCards onSelect={handleSuggestionSelect} />
+                  </motion.div>
+
+                  {isNewUser && (
+                    <div style={{ textAlign: "center", marginTop: 28 }}>
+                      <button
+                        type="button"
+                        onClick={openNewGoalModal}
+                        style={{
+                          padding: "10px 20px",
+                          borderRadius: 10,
+                          background: "transparent",
+                          border: "1px solid var(--border)",
+                          color: "var(--text-secondary)",
+                          fontSize: 13,
+                          fontWeight: 500,
+                          cursor: "pointer",
+                          fontFamily: "var(--font-body)",
+                        }}
+                      >
+                        Or start a named goal
+                      </button>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {messages.length > 0 && (
               <div style={{ display: "flex", flexDirection: "column", gap: 24, paddingTop: 16, paddingBottom: 24 }}>
@@ -176,57 +209,31 @@ function DashboardContent() {
                 <div ref={bottomRef} />
               </div>
             )}
-
-            {isNewUser && showHero && (
-              <div style={{ textAlign: "center", marginTop: 24 }}>
-                <button
-                  type="button"
-                  onClick={openNewGoalModal}
-                  style={{
-                    padding: "10px 20px",
-                    borderRadius: 10,
-                    background: "var(--accent)",
-                    border: "1px solid var(--accent)",
-                    color: "var(--accent-on)",
-                    fontSize: 13,
-                    fontWeight: 500,
-                    cursor: "pointer",
-                    fontFamily: "var(--font-body)",
-                  }}
-                >
-                  Start a Goal
-                </button>
-              </div>
-            )}
           </div>
         </div>
 
-        <div
-          style={{
-            flexShrink: 0,
-            padding: "12px 20px 20px",
-            borderTop: "1px solid var(--border)",
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
-          <div style={{ maxWidth: 720, margin: "0 auto", width: "100%" }}>
-            {floatingIntervention && (
-              <FloatingInterventionCard
-                intervention={floatingIntervention}
-                onDismiss={() => setFloatingIntervention(null)}
-                onAction={() => setFloatingIntervention(null)}
-              />
-            )}
-            <TaskInput
-              value={inputValue}
-              onValueChange={setInputValue}
-              focusKey={inputFocusKey}
-              onSubmit={handleSubmit}
-              loading={loading}
-            />
+        {!showHero && (
+          <div
+            style={{
+              flexShrink: 0,
+              padding: "12px 20px 20px",
+              borderTop: "1px solid var(--border)",
+              position: "relative",
+              zIndex: 1,
+            }}
+          >
+            <div style={{ maxWidth: 720, margin: "0 auto", width: "100%" }}>
+              {floatingIntervention && (
+                <FloatingInterventionCard
+                  intervention={floatingIntervention}
+                  onDismiss={() => setFloatingIntervention(null)}
+                  onAction={() => setFloatingIntervention(null)}
+                />
+              )}
+              <TaskInput {...inputProps} />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </>
   );

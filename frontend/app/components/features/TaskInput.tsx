@@ -23,6 +23,7 @@ interface TaskInputProps {
   value?: string;
   onValueChange?: (value: string) => void;
   focusKey?: number;
+  prominent?: boolean;
 }
 
 const textareaStyle: React.CSSProperties = {
@@ -48,6 +49,7 @@ export default function TaskInput({
   value: controlledValue,
   onValueChange,
   focusKey = 0,
+  prominent = false,
 }: TaskInputProps) {
   const [internalValue, setInternalValue] = useState("");
   const isControlled = controlledValue !== undefined;
@@ -60,16 +62,19 @@ export default function TaskInput({
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const minTextHeight = prominent ? LINE_HEIGHT * 3 : MIN_TEXT_HEIGHT;
+  const maxTextHeight = prominent ? LINE_HEIGHT * 6 : MAX_TEXT_HEIGHT;
+
   const syncHeight = useCallback(() => {
     const el = textareaRef.current;
     if (!el) return;
 
     el.style.height = "0px";
     const scrollHeight = el.scrollHeight;
-    const nextHeight = Math.min(Math.max(scrollHeight, MIN_TEXT_HEIGHT), MAX_TEXT_HEIGHT);
+    const nextHeight = Math.min(Math.max(scrollHeight, minTextHeight), maxTextHeight);
     el.style.height = `${nextHeight}px`;
-    el.style.overflowY = scrollHeight > MAX_TEXT_HEIGHT ? "auto" : "hidden";
-  }, []);
+    el.style.overflowY = scrollHeight > maxTextHeight ? "auto" : "hidden";
+  }, [minTextHeight, maxTextHeight]);
 
   useLayoutEffect(() => {
     syncHeight();
@@ -107,13 +112,23 @@ export default function TaskInput({
     <div
       style={{
         borderRadius: "var(--radius-card)",
-        background: "var(--bg-input)",
+        background: prominent ? "var(--bg-card)" : "var(--bg-input)",
         border: focused
-          ? "1px solid var(--border-focus)"
+          ? prominent
+            ? "1.5px solid var(--accent)"
+            : "1px solid var(--border-focus)"
           : tooShort
           ? "1px solid var(--error)"
+          : prominent
+          ? "1.5px solid var(--border-accent)"
           : "1px solid var(--border)",
-        boxShadow: focused ? "var(--input-shadow-focus)" : "var(--input-shadow)",
+        boxShadow: focused
+          ? prominent
+            ? "0 0 0 3px var(--accent-glow-md), var(--shadow-md)"
+            : "var(--input-shadow-focus)"
+          : prominent
+          ? "var(--shadow-md)"
+          : "var(--input-shadow)",
         transition: "border-color 200ms var(--ease), box-shadow 200ms var(--ease)",
         display: "flex",
         flexDirection: "column",
@@ -121,7 +136,7 @@ export default function TaskInput({
     >
       <div
         style={{
-          padding: "14px 14px 8px 18px",
+          padding: prominent ? "18px 20px 10px 22px" : "14px 14px 8px 18px",
           flexShrink: 0,
         }}
       >
@@ -134,12 +149,13 @@ export default function TaskInput({
           onBlur={() => setFocused(false)}
           onKeyDown={handleKeyDown}
           placeholder={PLACEHOLDERS[placeholderIdx]}
-          rows={MIN_ROWS}
+          rows={prominent ? 3 : MIN_ROWS}
           disabled={loading}
           style={{
             ...textareaStyle,
-            minHeight: MIN_TEXT_HEIGHT,
-            maxHeight: MAX_TEXT_HEIGHT,
+            minHeight: minTextHeight,
+            maxHeight: maxTextHeight,
+            fontSize: prominent ? 16 : 15,
             opacity: loading ? 0.6 : 1,
           }}
           aria-label="Share what you're working through"

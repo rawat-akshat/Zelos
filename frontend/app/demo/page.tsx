@@ -1,12 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ChevronRight } from "lucide-react";
 import LandingNav from "../components/landing/LandingNav";
 import LandingFooter from "../components/landing/LandingFooter";
 import LandingBackground from "../components/landing/LandingBackground";
 import FadeUp from "../components/landing/FadeUp";
+
+const AUTO_ADVANCE_MS = 5000;
+const WEEK_TRANSITION = { duration: 0.65, ease: [0.4, 0, 0.2, 1] as const };
 
 type DemoWeek = {
   id: number;
@@ -118,8 +122,22 @@ function cumulativeTimeline(throughWeek: number): string[] {
 export default function DemoPage() {
   const [navBlur, setNavBlur] = useState(false);
   const [activeWeek, setActiveWeek] = useState(0);
+  const [progressKey, setProgressKey] = useState(0);
   const week = WEEKS[activeWeek];
   const timeline = cumulativeTimeline(activeWeek);
+
+  const selectWeek = useCallback((index: number) => {
+    setActiveWeek(index);
+    setProgressKey((k) => k + 1);
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setActiveWeek((prev) => (prev + 1) % WEEKS.length);
+      setProgressKey((k) => k + 1);
+    }, AUTO_ADVANCE_MS);
+    return () => window.clearTimeout(timer);
+  }, [activeWeek]);
 
   return (
     <div
@@ -159,48 +177,58 @@ export default function DemoPage() {
             </p>
           </FadeUp>
 
-          <WeekSelector active={activeWeek} onSelect={setActiveWeek} />
+          <WeekSelector active={activeWeek} progressKey={progressKey} onSelect={selectWeek} />
 
-          <div className="demo-main-grid" style={{ marginBottom: 24 }}>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`chat-${activeWeek}`}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.22 }}
-              >
-                <ConversationCard week={week} />
-              </motion.div>
-            </AnimatePresence>
+          <div className="demo-week-stage">
+            <div className="demo-main-grid">
+              <div className="demo-grid-cell">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={`chat-${activeWeek}`}
+                    className="demo-grid-cell-inner"
+                    initial={{ opacity: 0, x: 16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -16 }}
+                    transition={WEEK_TRANSITION}
+                  >
+                    <ConversationCard week={week} />
+                  </motion.div>
+                </AnimatePresence>
+              </div>
 
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`intel-${activeWeek}`}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.22, delay: 0.04 }}
-              >
-                <GoalIntelligenceCard week={week} />
-              </motion.div>
-            </AnimatePresence>
+              <div className="demo-grid-cell">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={`intel-${activeWeek}`}
+                    className="demo-grid-cell-inner"
+                    initial={{ opacity: 0, x: 16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -16 }}
+                    transition={{ ...WEEK_TRANSITION, delay: 0.06 }}
+                  >
+                    <GoalIntelligenceCard week={week} />
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </div>
+
+            <div className="demo-timeline-stage">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`timeline-${activeWeek}`}
+                  className="demo-timeline-inner"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={WEEK_TRANSITION}
+                >
+                  <TimelineCard items={timeline} goal={week.goal} />
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
 
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`timeline-${activeWeek}`}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.22 }}
-            >
-              <TimelineCard items={timeline} goal={week.goal} />
-            </motion.div>
-          </AnimatePresence>
-
-          <FadeUp>
-            <div style={{ textAlign: "center", marginTop: 64, maxWidth: 480, marginInline: "auto" }}>
+          <div className="demo-bottom-cta">
               <h2 className="font-landing-heading landing-card-title" style={{ marginBottom: 12 }}>
                 Ready to stop restarting the same loop?
               </h2>
@@ -223,23 +251,59 @@ export default function DemoPage() {
               >
                 Start Your First Goal
               </Link>
-            </div>
-          </FadeUp>
+          </div>
         </div>
       </main>
 
       <LandingFooter />
 
       <style>{`
+        .demo-week-stage {
+          margin-bottom: 0;
+        }
         .demo-main-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 20px;
-          align-items: start;
+          margin-bottom: 24px;
+        }
+        .demo-grid-cell {
+          position: relative;
+          min-height: 480px;
+        }
+        .demo-grid-cell-inner {
+          position: absolute;
+          inset: 0;
+        }
+        .demo-timeline-stage {
+          position: relative;
+          min-height: 360px;
+        }
+        .demo-timeline-inner {
+          position: absolute;
+          inset: 0;
+        }
+        .demo-bottom-cta {
+          text-align: center;
+          margin-top: 64px;
+          max-width: 480px;
+          margin-inline: auto;
         }
         @media (max-width: 768px) {
           .demo-main-grid {
             grid-template-columns: 1fr;
+          }
+          .demo-grid-cell {
+            min-height: 280px;
+          }
+          .demo-timeline-stage {
+            min-height: 280px;
+          }
+          .demo-week-arrow {
+            display: none;
+          }
+          .demo-week-selector {
+            gap: 8px !important;
           }
         }
       `}</style>
@@ -249,45 +313,87 @@ export default function DemoPage() {
 
 function WeekSelector({
   active,
+  progressKey,
   onSelect,
 }: {
   active: number;
+  progressKey: number;
   onSelect: (i: number) => void;
 }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 10,
-        justifyContent: "center",
-        marginBottom: 28,
-      }}
-    >
-      {WEEKS.map((w) => (
-        <button
-          key={w.id}
-          type="button"
-          onClick={() => onSelect(w.id)}
-          style={{
-            padding: "10px 20px",
-            borderRadius: 20,
-            fontSize: 14,
-            fontWeight: 500,
-            cursor: "pointer",
-            fontFamily: "var(--font-body)",
-            border:
-              active === w.id
-                ? "1px solid rgba(201, 167, 92, 0.55)"
-                : "1px solid var(--landing-border)",
-            background: active === w.id ? "rgba(201, 167, 92, 0.14)" : "var(--landing-card)",
-            color: active === w.id ? "var(--landing-text)" : "var(--landing-text-secondary)",
-            transition: "all 180ms ease",
-          }}
-        >
-          {w.label}
-        </button>
-      ))}
+    <div style={{ marginBottom: 28 }}>
+      <div
+        className="demo-week-selector"
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 6,
+        }}
+      >
+        {WEEKS.map((w, index) => (
+          <Fragment key={w.id}>
+            <button
+              type="button"
+              onClick={() => onSelect(w.id)}
+              className="demo-week-btn"
+              aria-current={active === w.id ? "step" : undefined}
+              style={{
+                position: "relative",
+                overflow: "hidden",
+                padding: "10px 20px",
+                borderRadius: 20,
+                fontSize: 14,
+                fontWeight: 500,
+                cursor: "pointer",
+                fontFamily: "var(--font-body)",
+                border:
+                  active === w.id
+                    ? "1px solid rgba(201, 167, 92, 0.55)"
+                    : "1px solid var(--landing-border)",
+                background: active === w.id ? "rgba(201, 167, 92, 0.14)" : "var(--landing-card)",
+                color: active === w.id ? "var(--landing-text)" : "var(--landing-text-secondary)",
+                transition: "background 400ms ease, border-color 400ms ease, color 400ms ease",
+              }}
+            >
+              {w.label}
+              {active === w.id && (
+                <motion.span
+                  key={progressKey}
+                  aria-hidden
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: AUTO_ADVANCE_MS / 1000, ease: "linear" }}
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    height: 2,
+                    background: "#C9A75C",
+                    transformOrigin: "left center",
+                    display: "block",
+                  }}
+                />
+              )}
+            </button>
+            {index < WEEKS.length - 1 && (
+              <ChevronRight
+                size={15}
+                strokeWidth={2}
+                aria-hidden
+                className="demo-week-arrow"
+                style={{
+                  color: "var(--landing-text-secondary)",
+                  opacity: 0.85,
+                  flexShrink: 0,
+                }}
+              />
+            )}
+          </Fragment>
+        ))}
+      </div>
     </div>
   );
 }

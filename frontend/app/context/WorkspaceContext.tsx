@@ -3,7 +3,6 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 import type { Goal, Pattern, TimelineEvent } from "../lib/types";
 import {
-  mockActiveGoal,
   mockPatterns,
   mockTimelineEvents,
 } from "../lib/mock-data";
@@ -13,9 +12,11 @@ interface WorkspaceContextValue {
   patterns: Pattern[];
   timelineEvents: TimelineEvent[];
   isNewUser: boolean;
+  hasWorkspaceHistory: boolean;
   newGoalModalOpen: boolean;
   setActiveGoal: (goal: Goal | null) => void;
   startNewGoal: (title: string) => void;
+  markWorkspaceHistory: () => void;
   openNewGoalModal: () => void;
   closeNewGoalModal: () => void;
 }
@@ -23,10 +24,15 @@ interface WorkspaceContextValue {
 const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
 
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
-  const [activeGoal, setActiveGoal] = useState<Goal | null>(mockActiveGoal);
+  const [activeGoal, setActiveGoal] = useState<Goal | null>(null);
+  const [hasWorkspaceHistory, setHasWorkspaceHistory] = useState(false);
   const [patterns] = useState<Pattern[]>(mockPatterns);
   const [timelineEvents] = useState<TimelineEvent[]>(mockTimelineEvents);
   const [newGoalModalOpen, setNewGoalModalOpen] = useState(false);
+
+  const markWorkspaceHistory = useCallback(() => {
+    setHasWorkspaceHistory(true);
+  }, []);
 
   const startNewGoal = useCallback((title: string) => {
     const now = new Date();
@@ -47,17 +53,20 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const isNewUser = activeGoal === null;
+  const showSidebarInsights = hasWorkspaceHistory && activeGoal !== null;
 
   return (
     <WorkspaceContext.Provider
       value={{
         activeGoal,
-        patterns: isNewUser ? [] : patterns,
-        timelineEvents: isNewUser ? [] : timelineEvents,
+        patterns: showSidebarInsights ? patterns : [],
+        timelineEvents: showSidebarInsights ? timelineEvents : [],
         isNewUser,
+        hasWorkspaceHistory,
         newGoalModalOpen,
         setActiveGoal,
         startNewGoal,
+        markWorkspaceHistory,
         openNewGoalModal: () => setNewGoalModalOpen(true),
         closeNewGoalModal: () => setNewGoalModalOpen(false),
       }}

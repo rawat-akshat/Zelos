@@ -3,7 +3,7 @@ export default function CenterHero() {
     <div
       style={{
         flexShrink: 0,
-        padding: "28px 20px 8px",
+        padding: "20px 20px 4px",
         textAlign: "center",
         position: "relative",
         zIndex: 1,
