@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import FadeUp from "./FadeUp";
+import { useAuth } from "../../context/AuthContext";
+import { landingRoutes } from "../../lib/landing-nav";
 
 function HeroConversationVisual() {
   return (
@@ -85,6 +87,9 @@ function HeroConversationVisual() {
 }
 
 export default function HeroSection() {
+  const { isAuthenticated } = useAuth();
+  const routes = landingRoutes(isAuthenticated);
+
   return (
     <section
       style={{
@@ -118,7 +123,7 @@ export default function HeroSection() {
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
             <Link
-              href="/dashboard?newGoal=1"
+              href={routes.startGoal}
               className="landing-btn-primary"
               style={{
                 fontSize: 15,
@@ -130,7 +135,7 @@ export default function HeroSection() {
                 textDecoration: "none",
               }}
             >
-              Start a Goal
+              {isAuthenticated ? "Open Workspace" : "Start a Goal"}
             </Link>
             <a
               href="#how-it-works"

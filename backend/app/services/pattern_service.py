@@ -76,5 +76,34 @@ class PatternService:
             user_id, pattern_id, summary
         )
 
+    def list_session_patterns(
+        self, user_id: str, session_id: str
+    ) -> list[dict[str, Any]]:
+        occurrences = patterns.list_occurrences_for_session(
+            user_id, session_id, limit=20
+        )
+        definitions = {d["pattern_id"]: d for d in patterns.list_definitions()}
+        by_pattern: dict[str, dict[str, Any]] = {}
+        for occ in occurrences:
+            pid = occ["pattern_id"]
+            defn = definitions.get(pid, {})
+            if pid not in by_pattern:
+                by_pattern[pid] = {
+                    "pattern_id": pid,
+                    "name": defn.get("name") or pid,
+                    "description": defn.get("description") or "",
+                    "confidence": float(occ.get("confidence") or 0),
+                    "evidence_count": 1,
+                    "last_detected_at": occ.get("created_at"),
+                }
+            else:
+                entry = by_pattern[pid]
+                entry["evidence_count"] += 1
+                conf = float(occ.get("confidence") or 0)
+                if conf > entry["confidence"]:
+                    entry["confidence"] = conf
+                entry["last_detected_at"] = occ.get("created_at")
+        return list(by_pattern.values())
+
 
 pattern_service = PatternService()

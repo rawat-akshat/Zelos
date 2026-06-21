@@ -10,7 +10,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from app.models.phase1_schemas import ExchangeTokenRequest, ExchangeTokenResponse, UserResponseV3
+from app.models.phase1_schemas import ExchangeTokenRequest, ExchangeTokenResponse, UserResponseV3, UserUpdate
 from app.models.schemas import SuccessResponse
 from app.services.auth_service import auth_service
 from app.utils.auth import decode_access_token
@@ -65,6 +65,25 @@ async def get_me(user_id: UUID = Depends(get_current_user)):
     """Get the authenticated user's account record."""
     try:
         return auth_service.get_me(str(user_id))
+    except LookupError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        ) from exc
+
+
+@router.patch("/me", response_model=UserResponseV3)
+async def update_me(
+    body: UserUpdate,
+    user_id: UUID = Depends(get_current_user),
+):
+    try:
+        return auth_service.update_me(
+            str(user_id),
+            name=body.name,
+            avatar_url=body.avatar_url,
+            onboarding_completed=body.onboarding_completed,
+        )
     except LookupError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

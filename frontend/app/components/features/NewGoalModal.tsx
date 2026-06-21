@@ -1,16 +1,27 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { GOAL_HELPER_CHIPS } from "../../lib/mock-data";
+import { formatApiError } from "../../lib/api-errors";
 
 interface NewGoalModalProps {
   open: boolean;
   onClose: () => void;
-  onCreate: (title: string) => void;
+  onCreate: (title: string) => void | Promise<void>;
 }
 
 export default function NewGoalModal({ open, onClose, onCreate }: NewGoalModalProps) {
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open, onClose]);
+
   return (
     <AnimatePresence>
       {open && (
@@ -87,20 +98,49 @@ function GoalSetupForm({
   onCreate,
   onClose,
 }: {
-  onCreate: (title: string) => void;
+  onCreate: (title: string) => void | Promise<void>;
   onClose: () => void;
 }) {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const title = String(fd.get("goal") ?? "").trim();
     if (title.length < 3) return;
-    onCreate(title);
-    onClose();
+
+    setSubmitting(true);
+    setError(null);
+    try {
+      await onCreate(title);
+      onClose();
+    } catch (err) {
+      setError(formatApiError(err));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit}>
+      {error ? (
+        <p
+          role="alert"
+          style={{
+            fontSize: 13,
+            color: "var(--text-primary)",
+            background: "rgba(180, 60, 60, 0.08)",
+            border: "1px solid rgba(180, 60, 60, 0.35)",
+            borderRadius: 10,
+            padding: "10px 12px",
+            marginBottom: 12,
+            lineHeight: 1.5,
+          }}
+        >
+          {error}
+        </p>
+      ) : null}
       <textarea
         name="goal"
         rows={3}
@@ -129,20 +169,21 @@ function GoalSetupForm({
       </div>
       <button
         type="submit"
+        disabled={submitting}
         style={{
           width: "100%",
           padding: "12px 20px",
           borderRadius: 10,
-          background: "var(--accent)",
-          border: "1px solid var(--accent)",
-          color: "var(--accent-on)",
+          background: submitting ? "var(--bg-elevated)" : "var(--accent)",
+          border: "1px solid var(--border)",
+          color: submitting ? "var(--text-muted)" : "var(--accent-on)",
           fontSize: 14,
           fontWeight: 500,
-          cursor: "pointer",
+          cursor: submitting ? "not-allowed" : "pointer",
           fontFamily: "var(--font-body)",
         }}
       >
-        Open Workspace
+        {submitting ? "Opening workspace…" : "Open Workspace"}
       </button>
     </form>
   );

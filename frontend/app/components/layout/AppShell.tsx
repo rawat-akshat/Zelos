@@ -2,14 +2,15 @@
 
 import Sidebar from "./Sidebar";
 import RightPanel from "./RightPanel";
-import NewGoalModal from "../features/NewGoalModal";
+import NewGoalModalHost from "./NewGoalModalHost";
 import { Menu } from "lucide-react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { usePathname } from "next/navigation";
-import { NAV_ITEMS, NAV_PAGE_TITLES } from "./nav-config";
+import { NAV_ITEMS, NAV_PAGE_TITLES, getNavItems } from "./nav-config";
 import NavItem from "./NavItem";
 import LandingBackground from "../landing/LandingBackground";
-import { WorkspaceProvider, useWorkspace } from "../../context/WorkspaceContext";
+import { useWorkspace } from "../../context/WorkspaceContext";
+import { useAuth } from "../../context/AuthContext";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -18,15 +19,14 @@ interface AppShellProps {
 function AppShellInner({ children }: AppShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { isAuthenticated } = useAuth();
+  const navItems = getNavItems(isAuthenticated);
   const {
     activeGoal,
     patterns,
     timelineEvents,
     isNewUser,
     hasWorkspaceHistory,
-    newGoalModalOpen,
-    closeNewGoalModal,
-    startNewGoal,
   } = useWorkspace();
 
   const pageTitle = NAV_PAGE_TITLES[pathname] ?? "Zelos";
@@ -34,11 +34,9 @@ function AppShellInner({ children }: AppShellProps) {
 
   return (
     <div className="flex min-h-screen" style={{ background: "var(--bg-base)" }}>
-      <NewGoalModal
-        open={newGoalModalOpen}
-        onClose={closeNewGoalModal}
-        onCreate={startNewGoal}
-      />
+      <Suspense fallback={null}>
+        <NewGoalModalHost />
+      </Suspense>
 
       <Sidebar />
 
@@ -88,7 +86,7 @@ function AppShellInner({ children }: AppShellProps) {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <NavItem
                 key={item.href}
                 {...item}
@@ -134,9 +132,5 @@ function AppShellInner({ children }: AppShellProps) {
 }
 
 export default function AppShell({ children }: AppShellProps) {
-  return (
-    <WorkspaceProvider>
-      <AppShellInner>{children}</AppShellInner>
-    </WorkspaceProvider>
-  );
+  return <AppShellInner>{children}</AppShellInner>;
 }

@@ -46,6 +46,7 @@ export interface TimelineEvent {
   title: string;
   description?: string;
   confidence?: number;
+  messageId?: string;
   createdAt: Date;
 }
 

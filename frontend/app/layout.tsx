@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Instrument_Serif, Inter, Newsreader } from "next/font/google";
+import Providers from "./providers";
 import "./globals.css";
 
 const instrumentSerif = Instrument_Serif({
@@ -43,7 +44,7 @@ export default function RootLayout({
       className={`${instrumentSerif.variable} ${newsreader.variable} ${inter.variable}`}
     >
       <body suppressHydrationWarning className="font-body">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

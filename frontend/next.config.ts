@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
       { source: "/history", destination: "/goals", permanent: true },
       { source: "/streaks", destination: "/insights", permanent: true },
       { source: "/achievements", destination: "/insights", permanent: true },
+      { source: "/signup", destination: "/login?signup=1", permanent: false },
+      { source: "/workspace", destination: "/dashboard", permanent: false },
     ];
   },
 };

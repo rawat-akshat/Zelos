@@ -73,3 +73,17 @@ Matching Pydantic models:
 ### Next step
 
 Phase 2 — Auth + wire repositories to these tables.
+
+## Email confirmation (required for production)
+
+Zelos requires a verified inbox for email/password signups (Google OAuth is pre-verified).
+
+**Supabase Dashboard → Authentication → Providers → Email**
+
+1. Enable **Confirm email**
+2. **Authentication → URL Configuration** — add redirect URLs:
+   - `http://localhost:3000/auth/callback` (dev)
+   - `https://your-domain.com/auth/callback` (prod)
+
+After signup, users land on `/auth/verify-email` until they click the link in their inbox.
+Confirmation links redirect to `/auth/callback`, then the app sends them to the workspace.

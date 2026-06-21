@@ -31,6 +31,16 @@ class MessageStore:
             raise RuntimeError("Failed to create message")
         return result.data[0]
 
+    def get_by_id(self, message_id: str) -> Optional[dict[str, Any]]:
+        result = (
+            self._admin.table("messages")
+            .select("content, role, session_id")
+            .eq("id", message_id)
+            .limit(1)
+            .execute()
+        )
+        return result.data[0] if result.data else None
+
     def list_for_session(
         self,
         session_id: str,

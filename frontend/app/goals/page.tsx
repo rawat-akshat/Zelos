@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, ChevronDown, CheckCircle2 } from "lucide-react";
@@ -8,14 +8,18 @@ import AppShell from "../components/layout/AppShell";
 import PageContent from "../components/layout/PageContent";
 import { CardLabel } from "../components/layout/right-panel/PanelCard";
 import { useWorkspace } from "../context/WorkspaceContext";
-import { mockGoals, mockTimelineEvents, formatLastActive } from "../lib/mock-data";
+import { useAuth } from "../context/AuthContext";
+import { formatLastActive } from "../lib/mock-data";
+import { formatApiError } from "../lib/api-errors";
+import InlineAlert from "../components/ui/InlineAlert";
+import Button from "../components/ui/Button";
 import {
   formatPatternsObserved,
   getGoalsPageSummary,
   groupGoalsByStatus,
   MOMENTUM_META,
 } from "../lib/goal-helpers";
-import type { Goal } from "../lib/types";
+import type { Goal, GoalRecentEvent } from "../lib/types";
 
 export default function GoalsPage() {
   return (
@@ -26,8 +30,62 @@ export default function GoalsPage() {
 }
 
 function GoalsPageContent() {
-  const { openNewGoalModal } = useWorkspace();
-  const goals = mockGoals;
+  const router = useRouter();
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { openNewGoalModal, goals, refreshGoals } = useWorkspace();
+  const [goalsLoaded, setGoalsLoaded] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.replace("/login");
+      return;
+    }
+    if (isAuthenticated) {
+      setLoadError(null);
+      refreshGoals()
+        .catch((err) => setLoadError(formatApiError(err)))
+        .finally(() => setGoalsLoaded(true));
+    }
+  }, [authLoading, isAuthenticated, router, refreshGoals]);
+
+  if (authLoading || (isAuthenticated && !goalsLoaded)) {
+    return (
+      <PageContent
+        title="Goals"
+        subtitle="Your active journeys, experiments, and long-term projects."
+        maxWidth={900}
+      >
+        <div />
+      </PageContent>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <PageContent
+        title="Goals"
+        subtitle="Your active journeys, experiments, and long-term projects."
+        maxWidth={900}
+      >
+        <InlineAlert title="Could not load goals">{loadError}</InlineAlert>
+        <div style={{ marginTop: 16 }}>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setGoalsLoaded(false);
+              setLoadError(null);
+              refreshGoals()
+                .catch((err) => setLoadError(formatApiError(err)))
+                .finally(() => setGoalsLoaded(true));
+            }}
+          >
+            Try again
+          </Button>
+        </div>
+      </PageContent>
+    );
+  }
 
   if (goals.length === 0) {
     return (
@@ -226,7 +284,7 @@ function GoalCard({
   const [expanded, setExpanded] = useState(false);
   const momentum = MOMENTUM_META[goal.momentum];
   const patternsLabel = formatPatternsObserved(goal.patternsObservedCount, goal.primaryPatternName);
-  const timeline = mockTimelineEvents.filter((e) => e.goalId === goal.id).slice(0, 5);
+  const timeline = goal.recentEvents;
 
   const continueGoal = () => router.push(`/dashboard?goal=${goal.id}`);
 
@@ -471,7 +529,7 @@ function GoalDetailPreview({
   patternsLabel,
 }: {
   goal: Goal;
-  timeline: typeof mockTimelineEvents;
+  timeline: GoalRecentEvent[];
   patternsLabel: string;
 }) {
   return (

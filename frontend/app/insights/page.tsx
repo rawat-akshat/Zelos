@@ -1,14 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import AppShell from "../components/layout/AppShell";
 import PageContent from "../components/layout/PageContent";
 import { CardLabel } from "../components/layout/right-panel/PanelCard";
 import PatternEvidenceModal from "../components/insights/PatternEvidenceModal";
-import { mockInsightsPage, getOccurrencesForPattern } from "../lib/insights-mock-data";
+import InlineAlert from "../components/ui/InlineAlert";
+import Button from "../components/ui/Button";
+import { apiInsightsToPageData, getOccurrencesForPattern } from "../lib/insights-api";
+import { api } from "../lib/api";
+import { formatApiError } from "../lib/api-errors";
+import { useAuth } from "../context/AuthContext";
 import { formatRelativeTime } from "../lib/mock-data";
-import type { InsightPattern } from "../lib/types";
+import type { InsightPattern, InsightsPageData } from "../lib/types";
 
 const TIMELINE_TYPE_LABELS: Record<string, string> = {
   goal_created: "Goal started",
@@ -20,14 +26,79 @@ const TIMELINE_TYPE_LABELS: Record<string, string> = {
 };
 
 export default function InsightsPage() {
-  const data = mockInsightsPage;
+  const router = useRouter();
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const [data, setData] = useState<InsightsPageData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [selectedPattern, setSelectedPattern] = useState<InsightPattern | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+
+  const loadInsights = useCallback(() => {
+    setLoading(true);
+    setLoadError(null);
+    return api
+      .getInsights()
+      .then((raw) => setData(apiInsightsToPageData(raw)))
+      .catch((err) => {
+        setData(null);
+        setLoadError(formatApiError(err));
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      router.replace("/login");
+      return;
+    }
+    loadInsights();
+  }, [authLoading, isAuthenticated, router, loadInsights]);
 
   const showToast = (message: string) => {
     setToast(message);
     setTimeout(() => setToast(null), 3200);
   };
+
+  if (loading) {
+    return (
+      <AppShell>
+        <PageContent title="Insights" subtitle="Loading your behavioral patterns…" maxWidth={640}>
+          <div />
+        </PageContent>
+      </AppShell>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <AppShell>
+        <PageContent
+          title="Insights"
+          subtitle="Your long-term behavioral patterns and what works for you"
+          maxWidth={640}
+        >
+          <InlineAlert title="Could not load insights">{loadError}</InlineAlert>
+          <div style={{ marginTop: 16 }}>
+            <Button variant="secondary" onClick={() => loadInsights()}>
+              Try again
+            </Button>
+          </div>
+        </PageContent>
+      </AppShell>
+    );
+  }
+
+  if (!data) {
+    return (
+      <AppShell>
+        <PageContent title="Insights" subtitle="Something went wrong." maxWidth={640}>
+          <div />
+        </PageContent>
+      </AppShell>
+    );
+  }
 
   if (!data.hasData) {
     return (
@@ -49,7 +120,7 @@ export default function InsightsPage() {
         open={selectedPattern !== null}
         pattern={selectedPattern}
         occurrences={
-          selectedPattern ? getOccurrencesForPattern(selectedPattern.id) : []
+          selectedPattern ? getOccurrencesForPattern(selectedPattern.id, data.occurrences) : []
         }
         onClose={() => setSelectedPattern(null)}
         onDeepLinkPlaceholder={showToast}
@@ -161,7 +232,7 @@ function EmptyState() {
 function SummaryCards({
   summary,
 }: {
-  summary: (typeof mockInsightsPage)["summary"];
+  summary: InsightsPageData["summary"];
 }) {
   const cards = [
     { label: "Active Goals", value: summary.activeGoals },
@@ -204,7 +275,7 @@ function SummaryCards({
 function BehavioralProfile({
   metrics,
 }: {
-  metrics: (typeof mockInsightsPage)["behavioralProfile"];
+  metrics: InsightsPageData["behavioralProfile"];
 }) {
   return (
     <div
@@ -335,7 +406,7 @@ function PatternCard({
 function PlaybookSection({
   playbook,
 }: {
-  playbook: (typeof mockInsightsPage)["playbook"];
+  playbook: InsightsPageData["playbook"];
 }) {
   return (
     <>
@@ -409,7 +480,7 @@ function PlaybookCard({
 function BehavioralTimeline({
   items,
 }: {
-  items: (typeof mockInsightsPage)["timeline"];
+  items: InsightsPageData["timeline"];
 }) {
   return (
     <div
@@ -470,8 +541,8 @@ function ExperimentsSection({
   active,
   completed,
 }: {
-  active: (typeof mockInsightsPage)["activeExperiments"];
-  completed: (typeof mockInsightsPage)["completedExperiments"];
+  active: InsightsPageData["activeExperiments"];
+  completed: InsightsPageData["completedExperiments"];
 }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
@@ -487,7 +558,7 @@ function ExperimentGroup({
   completed,
 }: {
   label: string;
-  experiments: (typeof mockInsightsPage)["activeExperiments"];
+  experiments: InsightsPageData["activeExperiments"];
   completed?: boolean;
 }) {
   return (

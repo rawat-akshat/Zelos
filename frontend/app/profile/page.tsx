@@ -1,14 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Check } from "lucide-react";
 import AppShell from "../components/layout/AppShell";
 import PageContent from "../components/layout/PageContent";
 import ProfileSection, { ProfileRow, ProfileRowLast } from "../components/layout/ProfileSection";
 import Button from "../components/ui/Button";
+import Toast from "../components/ui/Toast";
+import InlineAlert from "../components/ui/InlineAlert";
 import UpgradeProModal from "../components/profile/UpgradeProModal";
 import EditProfileModal from "../components/profile/EditProfileModal";
-import { mockUser, mockProfileSnapshot } from "../lib/mock-data";
+import { useAuth } from "../context/AuthContext";
+import { api } from "../lib/api";
+import { formatApiError } from "../lib/api-errors";
 
 const FREE_PLAN_FEATURES = [
   "Limited active goals",
@@ -31,16 +37,69 @@ function getInitials(name: string): string {
 }
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const { user, isAuthenticated, loading: authLoading, refreshUser } = useAuth();
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const [name, setName] = useState(mockUser.name);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(mockUser.avatarUrl);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [snapshot, setSnapshot] = useState({
+    activeGoals: 0,
+    patternsIdentified: 0,
+    playbookRulesLearned: 0,
+    goalsCompleted: 0,
+  });
+  const [snapshotError, setSnapshotError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      router.replace("/login");
+    }
+  }, [authLoading, isAuthenticated, router]);
+
+  useEffect(() => {
+    if (!user) return;
+    setName(user.name ?? "");
+    setEmail(user.email);
+    setAvatarUrl(user.avatar_url ?? null);
+  }, [user]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    api
+      .getInsights()
+      .then((data) => {
+        setSnapshot({
+          activeGoals: data.summary.active_goals,
+          patternsIdentified: data.summary.patterns_detected,
+          playbookRulesLearned: data.summary.playbook_rules_learned,
+          goalsCompleted: data.summary.experiments_completed,
+        });
+      })
+      .catch((err) => setSnapshotError(formatApiError(err)));
+  }, [isAuthenticated]);
 
   const showToast = (message: string) => {
     setToast(message);
     setTimeout(() => setToast(null), 3200);
   };
+
+  if (authLoading || !user) {
+    return (
+      <AppShell>
+        <PageContent title="Profile" subtitle="Loading your account…">
+          <div />
+        </PageContent>
+      </AppShell>
+    );
+  }
+
+  const memberSince = user.created_at ? new Date(user.created_at) : new Date();
+  const isPremium = user.subscription_plan === "premium";
+  const displayName = name.trim() || email.split("@")[0] || "Account";
 
   return (
     <AppShell>
@@ -56,49 +115,86 @@ export default function ProfilePage() {
         open={editOpen}
         onClose={() => setEditOpen(false)}
         name={name}
-        email={mockUser.email}
+        email={email}
         avatarUrl={avatarUrl}
-        onSave={({ name: nextName, avatarUrl: nextAvatar }) => {
-          setName(nextName);
-          setAvatarUrl(nextAvatar);
-          showToast("Profile updated.");
+        onSave={async ({ name: nextName, avatarUrl: nextAvatar }) => {
+          try {
+            await api.updateMe({ name: nextName, avatar_url: nextAvatar ?? undefined });
+            setName(nextName);
+            setAvatarUrl(nextAvatar);
+            await refreshUser();
+            showToast("Profile updated.");
+          } catch (err) {
+            showToast(formatApiError(err));
+          }
         }}
       />
 
       <PageContent title="Profile" subtitle="Your account, plan, and data controls.">
         <ProfileHeaderCard
-          name={name}
-          email={mockUser.email}
-          memberSince={formatMemberSince(mockUser.memberSince)}
+          name={displayName}
+          email={email}
+          memberSince={formatMemberSince(memberSince)}
           avatarUrl={avatarUrl}
           onEdit={() => setEditOpen(true)}
         />
 
         <ProfileSection title="Current Plan">
           <p className="font-heading" style={{ fontSize: 28, color: "var(--text-primary)", margin: "0 0 8px" }}>
-            Free
+            {isPremium ? "Pro" : "Free"}
           </p>
           <p style={{ fontSize: 14, color: "var(--text-secondary)", margin: "0 0 20px" }}>
-            You are on the free plan.
+            {isPremium ? "You are on the Pro plan." : "You are on the free plan."}
           </p>
-          <ul style={{ listStyle: "none", margin: "0 0 24px", padding: 0, display: "flex", flexDirection: "column", gap: 10 }}>
-            {FREE_PLAN_FEATURES.map((feature) => (
-              <li key={feature} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "var(--text-secondary)" }}>
-                <Check size={14} style={{ color: "var(--accent)", flexShrink: 0 }} />
-                {feature}
-              </li>
-            ))}
-          </ul>
-          <Button variant="primary" onClick={() => setUpgradeOpen(true)}>
-            Upgrade to Pro
-          </Button>
+          {!isPremium && (
+            <>
+              <ul
+                style={{
+                  listStyle: "none",
+                  margin: "0 0 24px",
+                  padding: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                }}
+              >
+                {FREE_PLAN_FEATURES.map((feature) => (
+                  <li
+                    key={feature}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      fontSize: 14,
+                      color: "var(--text-secondary)",
+                    }}
+                  >
+                    <Check size={14} style={{ color: "var(--accent)", flexShrink: 0 }} />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <Button variant="primary" onClick={() => setUpgradeOpen(true)}>
+                Upgrade to Pro
+              </Button>
+            </>
+          )}
         </ProfileSection>
 
         <ProfileSection title="Your Zelos Snapshot">
-          <ProfileRow label="Active Goals" value={mockProfileSnapshot.activeGoals} />
-          <ProfileRow label="Patterns Identified" value={mockProfileSnapshot.patternsIdentified} />
-          <ProfileRow label="Playbook Rules Learned" value={mockProfileSnapshot.playbookRulesLearned} />
-          <ProfileRowLast label="Goals Completed" value={mockProfileSnapshot.goalsCompleted} />
+          {snapshotError ? (
+            <InlineAlert onDismiss={() => setSnapshotError(null)}>{snapshotError}</InlineAlert>
+          ) : (
+            <>
+              <ProfileRow label="Active Goals" value={snapshot.activeGoals} />
+              <ProfileRow label="Patterns Identified" value={snapshot.patternsIdentified} />
+              <ProfileRow
+                label="Playbook Rules Learned"
+                value={snapshot.playbookRulesLearned}
+              />
+              <ProfileRowLast label="Goals Completed" value={snapshot.goalsCompleted} />
+            </>
+          )}
         </ProfileSection>
 
         <ProfileSection title="Data & Privacy">
@@ -107,32 +203,16 @@ export default function ProfilePage() {
             <PrivacyAction label="Delete Account" disabled />
             <PrivacyAction label="Privacy Settings" disabled />
           </div>
-          <p style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.6, margin: 0 }}>
+          <p style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.6, margin: "0 0 12px" }}>
             You control your account data. More detailed export and deletion controls will be added soon.
           </p>
+          <Link href="/settings" style={{ fontSize: 13, color: "var(--text-secondary)" }}>
+            Account settings →
+          </Link>
         </ProfileSection>
       </PageContent>
 
-      {toast && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: 28,
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: 60,
-            padding: "12px 20px",
-            borderRadius: 10,
-            background: "var(--bg-card)",
-            border: "1px solid var(--border-accent)",
-            boxShadow: "var(--shadow-md)",
-            fontSize: 14,
-            color: "var(--text-primary)",
-          }}
-        >
-          {toast}
-        </div>
-      )}
+      {toast && <Toast message={toast} />}
     </AppShell>
   );
 }

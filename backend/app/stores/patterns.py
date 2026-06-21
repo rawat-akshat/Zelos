@@ -62,6 +62,31 @@ class PatternStore:
         )
         return result.data
 
+    def list_occurrences_for_user(
+        self, user_id: str, limit: int = 200
+    ) -> list[dict[str, Any]]:
+        result = (
+            self._admin.table("pattern_occurrences")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .limit(limit)
+            .execute()
+        )
+        return result.data
+
+    def list_all_user_behavior_patterns(
+        self, user_id: str
+    ) -> list[dict[str, Any]]:
+        result = (
+            self._admin.table("user_behavior_patterns")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("frequency", desc=True)
+            .execute()
+        )
+        return result.data
+
     def get_user_behavior_pattern(
         self, user_id: str, pattern_id: str
     ) -> Optional[dict[str, Any]]:

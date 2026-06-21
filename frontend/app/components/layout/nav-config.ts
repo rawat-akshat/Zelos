@@ -21,6 +21,11 @@ export const NAV_ITEMS: NavConfig[] = [
   { href: "/settings", icon: Settings, label: "Settings" },
 ];
 
+export function getNavItems(isAuthenticated: boolean): NavConfig[] {
+  if (isAuthenticated) return NAV_ITEMS;
+  return NAV_ITEMS.filter((item) => item.href === "/dashboard");
+}
+
 export const NAV_PAGE_TITLES: Record<string, string> = {
   "/dashboard": "Workspace",
   "/goals": "Goals",

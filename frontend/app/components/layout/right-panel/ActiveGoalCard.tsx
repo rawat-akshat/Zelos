@@ -1,14 +1,13 @@
 "use client";
 
 import { PanelCard, CardLabel } from "./PanelCard";
-import { mockActiveGoal } from "../../../lib/mock-data";
+import type { Goal } from "../../../lib/types";
 
 interface ActiveGoalCardProps {
-  goal?: typeof mockActiveGoal | null;
+  goal?: Goal | null;
 }
 
 export default function ActiveGoalCard({ goal }: ActiveGoalCardProps) {
-  const g = goal ?? mockActiveGoal;
   const isEmpty = !goal;
 
   return (
@@ -29,12 +28,12 @@ export default function ActiveGoalCard({ goal }: ActiveGoalCardProps) {
             className="font-heading"
             style={{ fontSize: 20, color: "var(--text-primary)", marginBottom: 14, lineHeight: 1.25 }}
           >
-            {g.title}
+            {goal.title}
           </h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <Row label="Current Focus" value={g.currentFocus} highlight />
-            <Row label="Last Action" value={g.lastAction ?? "—"} />
-            <Row label="Next Step" value={g.nextStep} />
+            <Row label="Current Focus" value={goal.currentFocus} highlight />
+            <Row label="Last Action" value={goal.lastAction ?? "—"} />
+            <Row label="Next Step" value={goal.nextStep} />
           </div>
         </>
       )}

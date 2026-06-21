@@ -2,8 +2,13 @@
 
 import Link from "next/link";
 import FadeUp from "./FadeUp";
+import { useAuth } from "../../context/AuthContext";
+import { landingRoutes } from "../../lib/landing-nav";
 
 export default function FinalCTASection() {
+  const { isAuthenticated } = useAuth();
+  const routes = landingRoutes(isAuthenticated);
+
   return (
     <section
       style={{
@@ -23,7 +28,7 @@ export default function FinalCTASection() {
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center" }}>
             <Link
-              href="/dashboard?newGoal=1"
+              href={routes.startGoal}
               className="landing-btn-primary"
               style={{
                 display: "inline-block",
@@ -36,7 +41,7 @@ export default function FinalCTASection() {
                 textDecoration: "none",
               }}
             >
-              Start Your First Goal
+              {isAuthenticated ? "Open Workspace" : "Start Your First Goal"}
             </Link>
             <Link
               href="/demo"

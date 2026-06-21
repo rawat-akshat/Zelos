@@ -1,7 +1,6 @@
 "use client";
 
 import { PanelCard, CardLabel } from "./PanelCard";
-import { mockPatterns } from "../../../lib/mock-data";
 import type { Pattern } from "../../../lib/types";
 
 interface PatternsNoticedCardProps {
@@ -10,7 +9,7 @@ interface PatternsNoticedCardProps {
 }
 
 export default function PatternsNoticedCard({
-  patterns = mockPatterns,
+  patterns = [],
   empty = false,
 }: PatternsNoticedCardProps) {
   return (

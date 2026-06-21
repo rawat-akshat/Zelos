@@ -78,6 +78,14 @@ class Settings(BaseSettings):
     # ============================================
     STRIPE_SECRET_KEY: Optional[str] = None
     STRIPE_WEBHOOK_SECRET: Optional[str] = None
+
+    # ============================================
+    # LOCAL DEV (optional — scripts/curl only)
+    # ============================================
+    TEST_USER_EMAIL: Optional[str] = None
+    TEST_USER_PASSWORD: Optional[str] = None
+    DEV_SUPABASE_ACCESS_TOKEN: Optional[str] = None
+    DEV_BACKEND_JWT: Optional[str] = None
     
     # ============================================
     # CORS (which domains can call our API)

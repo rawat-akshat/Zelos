@@ -53,5 +53,35 @@ class UserStore:
             raise RuntimeError("Failed to create user")
         return result.data[0]
 
+    def update(
+        self,
+        user_id: str,
+        *,
+        name: Optional[str] = None,
+        avatar_url: Optional[str] = None,
+        onboarding_completed: Optional[bool] = None,
+    ) -> dict[str, Any]:
+        updates: dict[str, Any] = {}
+        if name is not None:
+            updates["name"] = name
+        if avatar_url is not None:
+            updates["avatar_url"] = avatar_url
+        if onboarding_completed is not None:
+            updates["onboarding_completed"] = onboarding_completed
+        if not updates:
+            existing = self.get_by_id(user_id)
+            if not existing:
+                raise LookupError("User not found")
+            return existing
+        result = (
+            self._admin.table("users")
+            .update(updates)
+            .eq("id", user_id)
+            .execute()
+        )
+        if not result.data:
+            raise LookupError("User not found")
+        return result.data[0]
+
 
 users = UserStore()

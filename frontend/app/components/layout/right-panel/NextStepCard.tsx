@@ -1,7 +1,6 @@
 "use client";
 
 import { PanelCard, CardLabel } from "./PanelCard";
-import { mockActiveGoal } from "../../../lib/mock-data";
 
 interface NextStepCardProps {
   nextStep?: string | null;
@@ -9,7 +8,7 @@ interface NextStepCardProps {
 }
 
 export default function NextStepCard({
-  nextStep = mockActiveGoal.nextStep,
+  nextStep,
   empty = false,
 }: NextStepCardProps) {
   return (

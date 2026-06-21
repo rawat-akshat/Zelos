@@ -70,5 +70,53 @@ class ProfileService:
         self.get_profile(user_id)
         return profiles.update(user_id, updates)
 
+    def get_coaching_preferences(self, user_id: str) -> dict[str, Any]:
+        profile = self.get_profile(user_id)
+        facts = {
+            f.get("key"): f.get("value")
+            for f in (profile.get("facts") or [])
+            if isinstance(f, dict)
+        }
+
+        def fact_bool(key: str, default: bool) -> bool:
+            raw = facts.get(key)
+            if raw is None:
+                return default
+            return str(raw).lower() in ("true", "1", "yes")
+
+        return {
+            "coaching_style": profile.get("preferred_tone") or "balanced",
+            "goal_checkins": fact_bool("pref_goal_checkins", True),
+            "weekly_reflection": fact_bool("pref_weekly_reflection", False),
+            "pattern_alerts": fact_bool("pref_pattern_alerts", True),
+        }
+
+    def update_coaching_preferences(
+        self,
+        user_id: str,
+        *,
+        coaching_style: Optional[str] = None,
+        goal_checkins: Optional[bool] = None,
+        weekly_reflection: Optional[bool] = None,
+        pattern_alerts: Optional[bool] = None,
+    ) -> dict[str, Any]:
+        if coaching_style is not None:
+            self.update_profile(user_id, preferred_tone=coaching_style)
+        if goal_checkins is not None:
+            self.upsert_fact(
+                user_id, key="pref_goal_checkins", value=str(goal_checkins).lower()
+            )
+        if weekly_reflection is not None:
+            self.upsert_fact(
+                user_id,
+                key="pref_weekly_reflection",
+                value=str(weekly_reflection).lower(),
+            )
+        if pattern_alerts is not None:
+            self.upsert_fact(
+                user_id, key="pref_pattern_alerts", value=str(pattern_alerts).lower()
+            )
+        return self.get_coaching_preferences(user_id)
+
 
 profile_service = ProfileService()

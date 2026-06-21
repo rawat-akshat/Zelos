@@ -1,11 +1,15 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { NAV_ITEMS } from "./nav-config";
+import { getNavItems } from "./nav-config";
 import NavItem from "./NavItem";
+import SidebarAccount from "./SidebarAccount";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { isAuthenticated } = useAuth();
+  const navItems = getNavItems(isAuthenticated);
 
   return (
     <aside
@@ -56,10 +60,12 @@ export default function Sidebar() {
           gap: "6px",
         }}
       >
-        {NAV_ITEMS.map((item) => (
+        {navItems.map((item) => (
           <NavItem key={item.href} {...item} active={pathname === item.href} />
         ))}
       </nav>
+
+      <SidebarAccount />
     </aside>
   );
 }

@@ -3,6 +3,7 @@ from typing import Any, Optional
 
 from app.stores.session_activity import session_activity
 from app.stores.sessions import sessions
+from app.stores.messages import messages as message_store
 
 
 def _utcnow() -> datetime:
@@ -138,6 +139,50 @@ class SessionService:
             "duration_seconds": duration,
             "total_time_spent_seconds": session["total_time_spent_seconds"],
         }
+
+    def import_guest_session(
+        self,
+        user_id: str,
+        *,
+        title: str,
+        goal: str,
+        messages: list[dict[str, str]],
+    ) -> dict[str, Any]:
+        if not messages:
+            raise ValueError("At least one message is required")
+
+        first_user = next(
+            (m["content"] for m in messages if m.get("role") == "user"),
+            goal,
+        )
+        row = sessions.create(
+            user_id=user_id,
+            title=title[:200],
+            goal=goal[:2000],
+            first_message=first_user[:2000],
+        )
+        session_id = row["id"]
+        last_ts: Optional[str] = None
+
+        for msg in messages:
+            role = msg.get("role")
+            content = (msg.get("content") or "").strip()
+            if role not in ("user", "assistant") or not content:
+                continue
+            created = message_store.create(
+                user_id=user_id,
+                session_id=session_id,
+                role=role,
+                content=content,
+                metadata={"imported_from_guest": True},
+            )
+            last_ts = created.get("created_at")
+
+        if last_ts:
+            sessions.touch_last_message_at(session_id, last_ts)
+            sessions.update_task_status(session_id, user_id, "in_progress")
+
+        return _normalize_session(sessions.get_by_id(session_id, user_id) or row)
 
 
 session_service = SessionService()

@@ -23,14 +23,12 @@ export default function PatternEvidenceModal({
   const router = useRouter();
 
   const handleOpenConversation = (occ: PatternOccurrence) => {
-    const path = `/dashboard?goalId=${occ.goalId}&messageId=${occ.messageId}`;
-    const implemented = false;
-    if (implemented) {
-      router.push(path);
-      onClose();
-    } else {
-      onDeepLinkPlaceholder("Conversation deep-link coming soon.");
+    if (!occ.messageId || !occ.goalId) {
+      onDeepLinkPlaceholder("No linked message for this occurrence.");
+      return;
     }
+    router.push(`/dashboard?goal=${occ.goalId}&messageId=${occ.messageId}`);
+    onClose();
   };
 
   return (

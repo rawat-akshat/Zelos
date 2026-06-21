@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import AppShell from "../components/layout/AppShell";
 import PageContent from "../components/layout/PageContent";
 import Card from "../components/ui/Card";
@@ -8,7 +9,10 @@ import Button from "../components/ui/Button";
 import EditProfileModal from "../components/profile/EditProfileModal";
 import UpgradeProModal from "../components/profile/UpgradeProModal";
 import DeleteAccountModal from "../components/settings/DeleteAccountModal";
-import { mockUser } from "../lib/mock-data";
+import { useAuth } from "../context/AuthContext";
+import { api } from "../lib/api";
+import { formatApiError } from "../lib/api-errors";
+import InlineAlert from "../components/ui/InlineAlert";
 
 type CoachingStyle = "supportive" | "balanced" | "direct";
 
@@ -62,8 +66,11 @@ function addDays(date: Date, days: number): Date {
 }
 
 export default function SettingsPage() {
-  const [name, setName] = useState(mockUser.name);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(mockUser.avatarUrl);
+  const router = useRouter();
+  const { user, isAuthenticated, loading: authLoading, refreshUser } = useAuth();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -74,14 +81,63 @@ export default function SettingsPage() {
   const [goalCheckins, setGoalCheckins] = useState(true);
   const [weeklyReflection, setWeeklyReflection] = useState(false);
   const [patternAlerts, setPatternAlerts] = useState(true);
+  const [prefsError, setPrefsError] = useState<string | null>(null);
 
-  const isPremium = mockUser.plan === "Premium";
+  const memberSince = user?.created_at ? new Date(user.created_at) : new Date();
+  const isPremium = user?.subscription_plan === "premium";
   const showUpgrade = !isPremium;
 
-  const showToast = (message: string) => {
+  useEffect(() => {
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      router.replace("/login");
+    }
+  }, [authLoading, isAuthenticated, router]);
+
+  useEffect(() => {
+    if (!user) return;
+    setName(user.name ?? "");
+    setEmail(user.email);
+    setAvatarUrl(user.avatar_url ?? null);
+  }, [user]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    setPrefsError(null);
+    api
+      .getCoachingPreferences()
+      .then((prefs) => {
+        setCoachingStyle(prefs.coaching_style);
+        setGoalCheckins(prefs.goal_checkins);
+        setWeeklyReflection(prefs.weekly_reflection);
+        setPatternAlerts(prefs.pattern_alerts);
+      })
+      .catch((err) => {
+        setPrefsError(formatApiError(err));
+      });
+  }, [isAuthenticated]);
+
+  const showToast = useCallback((message: string) => {
     setToast(message);
     setTimeout(() => setToast(null), 3200);
-  };
+  }, []);
+
+  const persistPreferences = useCallback(
+    async (patch: Partial<{
+      coaching_style: CoachingStyle;
+      goal_checkins: boolean;
+      weekly_reflection: boolean;
+      pattern_alerts: boolean;
+    }>) => {
+      if (!isAuthenticated) return;
+      try {
+        await api.updateCoachingPreferences(patch);
+      } catch (err) {
+        showToast(formatApiError(err));
+      }
+    },
+    [isAuthenticated, showToast]
+  );
 
   const handleScheduleDeletion = () => {
     setDeletionScheduledFor(addDays(new Date(), 30));
@@ -93,18 +149,34 @@ export default function SettingsPage() {
     showToast("Account restored.");
   };
 
+  if (authLoading || !isAuthenticated || !user) {
+    return (
+      <AppShell>
+        <PageContent title="Settings" subtitle="Loading your account…" maxWidth={560}>
+          <div />
+        </PageContent>
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell>
       <EditProfileModal
         open={editOpen}
         onClose={() => setEditOpen(false)}
         name={name}
-        email={mockUser.email}
+        email={email}
         avatarUrl={avatarUrl}
-        onSave={({ name: nextName, avatarUrl: nextAvatar }) => {
-          setName(nextName);
-          setAvatarUrl(nextAvatar);
-          showToast("Profile updated.");
+        onSave={async ({ name: nextName, avatarUrl: nextAvatar }) => {
+          try {
+            await api.updateMe({ name: nextName, avatar_url: nextAvatar ?? undefined });
+            setName(nextName);
+            setAvatarUrl(nextAvatar);
+            await refreshUser();
+            showToast("Profile updated.");
+          } catch (err) {
+            showToast(formatApiError(err));
+          }
         }}
       />
       <UpgradeProModal
@@ -129,10 +201,10 @@ export default function SettingsPage() {
         <SettingSection title="Account">
           <Card padding="none" className="zelos-settings-card">
             <AccountProfileCard
-              name={name}
-              email={mockUser.email}
-              memberSince={formatMemberSince(mockUser.memberSince)}
-              loginMethod={mockUser.loginMethod}
+              name={name || "Zelos user"}
+              email={email}
+              memberSince={formatMemberSince(memberSince)}
+              loginMethod={user?.auth_provider ?? "Email"}
               avatarUrl={avatarUrl}
             />
           </Card>
@@ -147,10 +219,18 @@ export default function SettingsPage() {
         </SettingSection>
 
         <SettingSection title="Coaching Preferences">
+          {prefsError ? (
+            <div style={{ marginBottom: 12 }}>
+              <InlineAlert onDismiss={() => setPrefsError(null)}>{prefsError}</InlineAlert>
+            </div>
+          ) : null}
           <Card padding="none" className="zelos-settings-card">
             <CoachingStyleGroup
               value={coachingStyle}
-              onChange={setCoachingStyle}
+              onChange={(style) => {
+                setCoachingStyle(style);
+                persistPreferences({ coaching_style: style });
+              }}
               options={COACHING_STYLES}
             />
           </Card>
@@ -162,19 +242,28 @@ export default function SettingsPage() {
               label="Goal Check-ins"
               description="Receive reminders when goals become inactive."
               checked={goalCheckins}
-              onChange={setGoalCheckins}
+              onChange={(v) => {
+                setGoalCheckins(v);
+                persistPreferences({ goal_checkins: v });
+              }}
             />
             <ToggleRow
               label="Weekly Reflection"
               description="Receive a weekly summary of patterns, progress, and insights."
               checked={weeklyReflection}
-              onChange={setWeeklyReflection}
+              onChange={(v) => {
+                setWeeklyReflection(v);
+                persistPreferences({ weekly_reflection: v });
+              }}
             />
             <ToggleRow
               label="Pattern Alerts"
               description="Get notified when Zelos notices recurring behavioral patterns."
               checked={patternAlerts}
-              onChange={setPatternAlerts}
+              onChange={(v) => {
+                setPatternAlerts(v);
+                persistPreferences({ pattern_alerts: v });
+              }}
             />
           </Card>
         </SettingSection>
@@ -182,12 +271,8 @@ export default function SettingsPage() {
         <SettingSection title="Current Plan">
           <Card padding="none" className="zelos-settings-card">
             <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12 }}>
-              <MetaLine label="Plan" value={isPremium ? "Premium" : mockUser.plan} />
-              {isPremium && mockUser.premiumRenewalDate ? (
-                <MetaLine label="Renewal" value={formatRenewalDate(mockUser.premiumRenewalDate)} />
-              ) : (
-                <MetaLine label="Status" value={mockUser.planStatus} />
-              )}
+              <MetaLine label="Plan" value={isPremium ? "Premium" : "Free"} />
+              <MetaLine label="Status" value={isPremium ? "Active" : "Free tier"} />
             </div>
           </Card>
           {showUpgrade && (

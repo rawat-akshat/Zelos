@@ -200,6 +200,146 @@ class SendMessageRequest(BaseModel):
 class ChatTurnResponse(BaseModel):
     user_message: MessageResponseV3
     assistant_message: MessageResponseV3
+    detected_patterns: List["DetectedPatternSummary"] = Field(default_factory=list)
+    intervention: Optional["InterventionSummary"] = None
+    timeline_events: List["TimelineEventResponse"] = Field(default_factory=list)
+
+
+class DetectedPatternSummary(BaseModel):
+    pattern_id: str
+    pattern_name: str
+    confidence: float
+    evidence: Optional[str] = None
+    timeline_title: Optional[str] = None
+    message_id: Optional[UUID] = None
+
+
+class InterventionSummary(BaseModel):
+    id: UUID
+    type: str
+    pattern_name: str
+    message: str
+    confidence: float
+    intervention_type: str
+    message_id: Optional[UUID] = None
+
+
+class TimelineEventResponse(BaseModel):
+    id: str
+    goal_id: str
+    type: str
+    title: str
+    description: Optional[str] = None
+    confidence: Optional[float] = None
+    message_id: Optional[str] = None
+    pattern_id: Optional[str] = None
+    created_at: datetime
+
+
+class UserUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=200)
+    avatar_url: Optional[str] = Field(None, max_length=2000)
+    onboarding_completed: Optional[bool] = None
+
+
+class CoachingPreferencesResponse(BaseModel):
+    coaching_style: str = "balanced"
+    goal_checkins: bool = True
+    weekly_reflection: bool = False
+    pattern_alerts: bool = True
+
+
+class CoachingPreferencesUpdate(BaseModel):
+    coaching_style: Optional[Literal["supportive", "balanced", "direct"]] = None
+    goal_checkins: Optional[bool] = None
+    weekly_reflection: Optional[bool] = None
+    pattern_alerts: Optional[bool] = None
+
+
+class GuestImportMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(..., min_length=1, max_length=10000)
+
+
+class SessionImportRequest(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+    goal: str = Field(..., min_length=1, max_length=2000)
+    messages: List[GuestImportMessage] = Field(..., min_length=1, max_length=40)
+
+
+class InsightsSummaryResponse(BaseModel):
+    active_goals: int
+    patterns_detected: int
+    playbook_rules_learned: int
+    experiments_completed: int
+
+
+class InsightsBehavioralMetric(BaseModel):
+    label: str
+    value: int
+
+
+class InsightsPatternGoal(BaseModel):
+    goal_id: str
+    goal_title: str
+    count: int
+
+
+class InsightsPatternItem(BaseModel):
+    id: str
+    name: str
+    description: str
+    confidence: int
+    observed_count: int
+    last_observed_at: str
+    goals: List[InsightsPatternGoal] = Field(default_factory=list)
+    trend: Optional[str] = None
+
+
+class InsightsOccurrenceItem(BaseModel):
+    id: str
+    pattern_id: str
+    goal_id: str
+    goal_title: str
+    conversation_id: str
+    message_id: str
+    confidence: float
+    evidence_text: str
+    message_preview: str
+    created_at: str
+
+
+class InsightsTimelineItem(BaseModel):
+    id: str
+    type: str
+    title: str
+    goal_title: str
+    created_at: datetime
+
+
+class InsightsExperimentItem(BaseModel):
+    id: str
+    title: str
+    goal_title: str
+    status: str
+    date: datetime
+
+
+class InsightsPlaybookSection(BaseModel):
+    works_well: List[str] = Field(default_factory=list)
+    does_not_work: List[str] = Field(default_factory=list)
+
+
+class InsightsPageResponse(BaseModel):
+    has_data: bool
+    summary: InsightsSummaryResponse
+    behavioral_profile: List[InsightsBehavioralMetric]
+    patterns: List[InsightsPatternItem]
+    occurrences: List[InsightsOccurrenceItem]
+    playbook: InsightsPlaybookSection
+    timeline: List[InsightsTimelineItem]
+    active_experiments: List[InsightsExperimentItem] = Field(default_factory=list)
+    completed_experiments: List[InsightsExperimentItem] = Field(default_factory=list)
 
 
 class SessionTitleUpdate(BaseModel):

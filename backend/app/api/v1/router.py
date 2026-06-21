@@ -8,6 +8,7 @@ from app.api.v1.endpoints import (
     auth,
     context,
     focus_sessions,
+    insights,
     interventions,
     messages,
     patterns,
@@ -31,3 +32,4 @@ router.include_router(
 router.include_router(profile.router, prefix="/profile", tags=["Profile"])
 router.include_router(playbook.router, prefix="/playbook", tags=["Playbook"])
 router.include_router(context.router, prefix="/context", tags=["Context"])
+router.include_router(insights.router, prefix="/insights", tags=["Insights"])

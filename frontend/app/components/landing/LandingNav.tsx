@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useAuth } from "../../context/AuthContext";
+import { landingRoutes } from "../../lib/landing-nav";
 
 interface LandingNavProps {
   blurred?: boolean;
@@ -8,6 +10,9 @@ interface LandingNavProps {
 }
 
 export default function LandingNav({ blurred = false, showCta = true }: LandingNavProps) {
+  const { isAuthenticated } = useAuth();
+  const routes = landingRoutes(isAuthenticated);
+
   return (
     <header
       style={{
@@ -44,7 +49,7 @@ export default function LandingNav({ blurred = false, showCta = true }: LandingN
 
       <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
         <Link
-          href="/login"
+          href={routes.signIn}
           style={{
             fontSize: 14,
             fontWeight: 500,
@@ -55,24 +60,24 @@ export default function LandingNav({ blurred = false, showCta = true }: LandingN
           onMouseEnter={(e) => (e.currentTarget.style.color = "var(--landing-text)")}
           onMouseLeave={(e) => (e.currentTarget.style.color = "var(--landing-text-secondary)")}
         >
-          Login
+          {isAuthenticated ? "Workspace" : "Log in"}
         </Link>
         {showCta && (
-        <Link
-          href="/dashboard?newGoal=1"
-          className="landing-btn-primary"
-          style={{
-            fontSize: 14,
-            fontWeight: 600,
-            padding: "10px 20px",
-            borderRadius: 10,
-            background: "#C9A75C",
-            color: "#1E1E1E",
-            textDecoration: "none",
-          }}
-        >
-          Start a Goal
-        </Link>
+          <Link
+            href={routes.startGoal}
+            className="landing-btn-primary"
+            style={{
+              fontSize: 14,
+              fontWeight: 600,
+              padding: "10px 20px",
+              borderRadius: 10,
+              background: "#C9A75C",
+              color: "#1E1E1E",
+              textDecoration: "none",
+            }}
+          >
+            {isAuthenticated ? "Open Workspace" : "Start a Goal"}
+          </Link>
         )}
       </div>
     </header>

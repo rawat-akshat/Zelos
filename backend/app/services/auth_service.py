@@ -29,11 +29,33 @@ def _extract_provider(supabase_user: Any) -> tuple[Optional[str], Optional[str]]
     return provider, str(supabase_user.id)
 
 
+def _is_email_verified(supabase_user: Any) -> bool:
+    if getattr(supabase_user, "email_confirmed_at", None):
+        return True
+
+    app_metadata = getattr(supabase_user, "app_metadata", None) or {}
+    if isinstance(app_metadata, dict):
+        provider = app_metadata.get("provider")
+        if provider and provider != "email":
+            return True
+
+    identities = getattr(supabase_user, "identities", None) or []
+    if isinstance(identities, list):
+        for identity in identities:
+            pid = identity.get("provider") if isinstance(identity, dict) else getattr(identity, "provider", None)
+            if pid and pid != "email":
+                return True
+
+    return False
+
+
 class AuthService:
     def verify_supabase_token(self, supabase_token: str):
         response = db.client.auth.get_user(supabase_token)
         if not response or not response.user:
             raise ValueError("Invalid Supabase token")
+        if not _is_email_verified(response.user):
+            raise ValueError("Email not confirmed")
         return response.user
 
     def provision_user(self, supabase_user: Any) -> dict[str, Any]:
@@ -83,6 +105,21 @@ class AuthService:
         if not user:
             raise LookupError("User not found")
         return user
+
+    def update_me(
+        self,
+        user_id: str,
+        *,
+        name: Optional[str] = None,
+        avatar_url: Optional[str] = None,
+        onboarding_completed: Optional[bool] = None,
+    ) -> dict[str, Any]:
+        return users.update(
+            user_id,
+            name=name,
+            avatar_url=avatar_url,
+            onboarding_completed=onboarding_completed,
+        )
 
 
 auth_service = AuthService()

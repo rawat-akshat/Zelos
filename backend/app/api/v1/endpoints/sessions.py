@@ -7,14 +7,17 @@ from app.models.phase1_schemas import (
     SessionActivityLogResponse,
     SessionCloseResponse,
     SessionCreateV3,
+    SessionImportRequest,
     SessionListV3,
     SessionResponseV3,
     SessionTitleUpdate,
     SessionUpdateGoal,
     SessionUpdateStatus,
+    TimelineEventResponse,
 )
 from app.models.schemas import SuccessResponse
 from app.services.session_service import session_service
+from app.services.timeline_service import timeline_service
 
 router = APIRouter(tags=["Sessions"])
 
@@ -30,6 +33,22 @@ async def create_session(
         goal=body.goal,
         first_message=body.first_message,
     )
+
+
+@router.post("/import", response_model=SessionResponseV3, status_code=status.HTTP_201_CREATED)
+async def import_guest_session(
+    body: SessionImportRequest,
+    user_id: UUID = Depends(get_current_user),
+):
+    try:
+        return session_service.import_guest_session(
+            str(user_id),
+            title=body.title,
+            goal=body.goal,
+            messages=[m.model_dump() for m in body.messages],
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @router.get("/", response_model=SessionListV3)
@@ -60,6 +79,19 @@ async def get_session(
 ):
     try:
         return session_service.get_session(str(user_id), str(session_id))
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@router.get("/{session_id}/timeline", response_model=list[TimelineEventResponse])
+async def get_session_timeline(
+    session_id: UUID,
+    user_id: UUID = Depends(get_current_user),
+):
+    try:
+        return timeline_service.get_session_timeline(
+            str(user_id), str(session_id)
+        )
     except LookupError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 

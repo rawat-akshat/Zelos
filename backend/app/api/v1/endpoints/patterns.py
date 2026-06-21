@@ -1,7 +1,9 @@
-from typing import List
+from typing import List, Optional
+from datetime import datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 
 from app.api.v1.endpoints.auth import get_current_user
 from app.models.phase1_schemas import (
@@ -16,12 +18,32 @@ from app.services.pattern_service import pattern_service
 router = APIRouter(tags=["Patterns"])
 
 
+class SessionPatternSummary(BaseModel):
+    pattern_id: str
+    name: str
+    description: str = ""
+    confidence: float
+    evidence_count: int
+    last_detected_at: Optional[datetime] = None
+
+
 @router.get("/definitions", response_model=List[PatternDefinitionResponse])
 async def list_pattern_definitions(
     user_id: UUID = Depends(get_current_user),
 ):
     _ = user_id
     return pattern_service.list_definitions()
+
+
+@router.get(
+    "/session/{session_id}",
+    response_model=List[SessionPatternSummary],
+)
+async def list_session_patterns(
+    session_id: UUID,
+    user_id: UUID = Depends(get_current_user),
+):
+    return pattern_service.list_session_patterns(str(user_id), str(session_id))
 
 
 @router.post(

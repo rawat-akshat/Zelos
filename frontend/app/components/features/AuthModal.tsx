@@ -2,13 +2,73 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { formatAuthError } from "../../lib/auth-errors";
+import { isSupabaseConfigured } from "../../lib/supabase";
+import PasswordInput from "../ui/PasswordInput";
 
 interface AuthModalProps {
   open: boolean;
+  required?: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
-export default function AuthModal({ open, onClose }: AuthModalProps) {
+export default function AuthModal({
+  open,
+  required = false,
+  onClose,
+  onSuccess,
+}: AuthModalProps) {
+  const router = useRouter();
+  const { signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
+  const [mode, setMode] = useState<"choose" | "email">("choose");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleGoogle() {
+    setError("");
+    setLoading(true);
+    try {
+      await signInWithGoogle();
+    } catch (e) {
+      setError(formatAuthError(e));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleEmail(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoading(true);
+    try {
+      if (isSignUp) {
+        await signUpWithEmail(email, password);
+        onClose();
+      } else {
+        await signInWithEmail(email, password);
+        onSuccess?.();
+      }
+    } catch (err) {
+      setError(formatAuthError(err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const title = required ? "Sign in to continue" : "Save your progress";
+  const subtitle = required
+    ? "You've reached the free preview limit. Sign in to keep chatting and save your goals."
+    : "Save your goals, track patterns over time, and continue your journey across conversations.";
+
   return (
     <AnimatePresence>
       {open && (
@@ -29,7 +89,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
             background: "var(--bg-overlay)",
             backdropFilter: "blur(8px)",
           }}
-          onClick={onClose}
+          onClick={required ? undefined : onClose}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.93, y: 14 }}
@@ -39,7 +99,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
             style={{
               position: "relative",
               width: "100%",
-              maxWidth: 340,
+              maxWidth: 380,
               borderRadius: "var(--radius-card)",
               padding: "36px 28px 28px",
               background: "var(--bg-card)",
@@ -48,27 +108,25 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={onClose}
-              aria-label="Close"
-              style={{
-                position: "absolute",
-                top: 14,
-                right: 14,
-                padding: 6,
-                borderRadius: 8,
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: "var(--text-muted)",
-                lineHeight: 0,
-                transition: "color 150ms",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
-            >
-              <X size={15} />
-            </button>
+            {!required && (
+              <button
+                onClick={onClose}
+                aria-label="Close"
+                style={{
+                  position: "absolute",
+                  top: 14,
+                  right: 14,
+                  padding: 6,
+                  borderRadius: 8,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "var(--text-muted)",
+                }}
+              >
+                <X size={15} />
+              </button>
+            )}
 
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
               <div
@@ -87,104 +145,143 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
               </div>
             </div>
 
-            <h2
-              className="font-heading"
-              style={{
-                fontSize: 22,
-                color: "var(--text-primary)",
-                textAlign: "center",
-                marginBottom: 8,
-                letterSpacing: "-0.028em",
-              }}
-            >
-              Save your progress
+            <h2 className="font-heading" style={{ fontSize: 22, color: "var(--text-primary)", textAlign: "center", marginBottom: 8 }}>
+              {title}
             </h2>
-            <p
-              style={{
-                fontSize: 13,
-                color: "var(--text-secondary)",
-                textAlign: "center",
-                lineHeight: 1.55,
-                marginBottom: 28,
-              }}
-            >
-              Save your goals, track patterns over time, and continue your journey across conversations.
+            <p style={{ fontSize: 13, color: "var(--text-secondary)", textAlign: "center", lineHeight: 1.55, marginBottom: 24 }}>
+              {subtitle}
             </p>
 
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-              <button
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 10,
-                  width: "100%",
-                  padding: "13px 20px",
-                  borderRadius: 12,
-                  background: "var(--accent)",
-                  color: "var(--accent-on)",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  border: "none",
-                  cursor: "pointer",
-                  transition: "background 200ms var(--ease)",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent-hover)")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "var(--accent)")}
-              >
-                <GoogleIcon />
-                Continue with Google
-              </button>
+            {!isSupabaseConfigured() && (
+              <p style={{ fontSize: 12, color: "var(--text-muted)", textAlign: "center", marginBottom: 16 }}>
+                Configure Supabase env vars to enable auth.
+              </p>
+            )}
 
-              <button
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "100%",
-                  padding: "13px 20px",
-                  borderRadius: 12,
-                  background: "transparent",
-                  color: "var(--accent)",
-                  fontSize: 14,
-                  fontWeight: 500,
-                  border: "1px solid var(--border-accent)",
-                  cursor: "pointer",
-                  transition: "all 180ms var(--ease)",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "var(--accent-glow)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                }}
-              >
-                Continue with Email
-              </button>
+            {error && mode === "choose" && (
+              <p style={{ fontSize: 12, color: "#A66B6B", margin: "0 0 12px", lineHeight: 1.5, textAlign: "center" }}>
+                {error}
+              </p>
+            )}
 
-              <button
-                onClick={onClose}
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: 12,
-                  color: "var(--text-muted)",
-                  padding: "6px 12px",
-                  transition: "color 150ms",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
-              >
-                Maybe later
-              </button>
-            </div>
+            {mode === "choose" ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={handleGoogle}
+                  style={primaryBtnStyle}
+                >
+                  <GoogleIcon />
+                  Continue with Google
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode("email")}
+                  style={secondaryBtnStyle}
+                >
+                  Continue with Email
+                </button>
+                {!required && (
+                  <button type="button" onClick={onClose} style={ghostBtnStyle}>
+                    Maybe later
+                  </button>
+                )}
+                {required && (
+                  <button type="button" onClick={() => router.push("/login?signup=1")} style={ghostBtnStyle}>
+                    Create an account
+                  </button>
+                )}
+                {required && (
+                  <button type="button" onClick={() => router.push("/login")} style={ghostBtnStyle}>
+                    Go to login page
+                  </button>
+                )}
+              </div>
+            ) : (
+              <form onSubmit={handleEmail} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  style={inputStyle}
+                />
+                <PasswordInput
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  inputStyle={inputStyle}
+                />
+                {error && <p style={{ fontSize: 12, color: "#A66B6B", margin: 0 }}>{error}</p>}
+                {success && <p style={{ fontSize: 12, color: "#5a7a5e", margin: 0 }}>{success}</p>}
+                <button type="submit" disabled={loading} style={primaryBtnStyle}>
+                  {loading ? "Please wait…" : isSignUp ? "Create account" : "Sign in"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsSignUp((v) => !v)}
+                  style={ghostBtnStyle}
+                >
+                  {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
+                </button>
+                <button type="button" onClick={() => setMode("choose")} style={ghostBtnStyle}>
+                  Back
+                </button>
+              </form>
+            )}
           </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
   );
 }
+
+const primaryBtnStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 10,
+  width: "100%",
+  padding: "13px 20px",
+  borderRadius: 12,
+  background: "var(--accent)",
+  color: "var(--accent-on)",
+  fontSize: 14,
+  fontWeight: 600,
+  border: "none",
+  cursor: "pointer",
+};
+
+const secondaryBtnStyle: React.CSSProperties = {
+  ...primaryBtnStyle,
+  background: "transparent",
+  color: "var(--accent)",
+  border: "1px solid var(--border-accent)",
+  fontWeight: 500,
+};
+
+const ghostBtnStyle: React.CSSProperties = {
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+  fontSize: 12,
+  color: "var(--text-muted)",
+  padding: "6px 12px",
+};
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  padding: "12px 14px",
+  borderRadius: 10,
+  border: "1px solid var(--border)",
+  background: "var(--bg-input)",
+  fontSize: 14,
+  color: "var(--text-primary)",
+};
 
 function GoogleIcon() {
   return (

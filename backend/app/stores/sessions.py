@@ -167,5 +167,19 @@ class SessionStore:
             "id", session_id
         ).execute()
 
+    def update_task_status(
+        self, session_id: str, user_id: str, task_status: str
+    ) -> dict[str, Any]:
+        result = (
+            self._admin.table("sessions")
+            .update({"task_status": task_status})
+            .eq("id", session_id)
+            .eq("user_id", user_id)
+            .execute()
+        )
+        if not result.data:
+            raise LookupError("Session not found")
+        return result.data[0]
+
 
 sessions = SessionStore()

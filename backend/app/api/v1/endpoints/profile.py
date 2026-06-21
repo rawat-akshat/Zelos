@@ -4,6 +4,8 @@ from fastapi import APIRouter, Depends
 
 from app.api.v1.endpoints.auth import get_current_user
 from app.models.phase1_schemas import (
+    CoachingPreferencesResponse,
+    CoachingPreferencesUpdate,
     ProfileFactUpsert,
     UserProfileResponse,
     UserProfileUpdate,
@@ -43,4 +45,23 @@ async def upsert_profile_fact(
         source_session_id=str(body.source_session_id)
         if body.source_session_id
         else None,
+    )
+
+
+@router.get("/preferences", response_model=CoachingPreferencesResponse)
+async def get_coaching_preferences(user_id: UUID = Depends(get_current_user)):
+    return profile_service.get_coaching_preferences(str(user_id))
+
+
+@router.patch("/preferences", response_model=CoachingPreferencesResponse)
+async def update_coaching_preferences(
+    body: CoachingPreferencesUpdate,
+    user_id: UUID = Depends(get_current_user),
+):
+    return profile_service.update_coaching_preferences(
+        str(user_id),
+        coaching_style=body.coaching_style,
+        goal_checkins=body.goal_checkins,
+        weekly_reflection=body.weekly_reflection,
+        pattern_alerts=body.pattern_alerts,
     )
